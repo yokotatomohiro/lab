@@ -1,5 +1,34 @@
 title
-Derivation of the QUBO form for sparse estimation
+Derivation of the QUBO formulation for sparse estimation
 
-abstract
-In recent years, annealing machine have been developed, and their use methods are considered in fields such as optimization problems and machine learning. In the annealing machine, it is necessary to express the problem to be dealt with in QUBO(Quadratic Unconstrained Binary Optimization) format and implement it as hardware. However, since the general method of rewriting to the QUBO format is not known yet, it needs to be derived individually. In this paper, we derive the QUBO form for the l1 norm (absolute value function) used in sparse estimation. As a result of experiment, it was possible to predict that one variable could be reduced from the result of numerical experiment by applying the Legendre transformation and Wolf-duality theorem to l1norm. By reviewing the formulation we were actually able to reduce one variable. In addition, as a result of conducting numerical experiments using the derived l1norm, it was confirmed that a sparse solution could be obtained.
+1. introduction
+ In recent years, annealing machine have been developed, and their use methods are considered in fields such as optimization problems and machine learning. In the annealing machine, it is necessary to express the problem to be dealt with in QUBO(Quadratic Unconstrained Binary Optimization) formulation and implement it as hardware. However, since the general method of rewriting to the QUBO format is not known yet, it needs to be derived individually. 
+ In this paper, we derive the QUBO formulation for the l1 norm (absolute value function) used in sparse estimation. As a result of experiment, it was possible to predict that one variable could be reduced from the result of numerical experiment by applying the Legendre transformation and Wolf-duality theorem to l1norm. By reviewing the formulation we were actually able to reduce one variable. In addition, as a result of conducting numerical experiments using the derived l1norm, it was confirmed that a sparse solution could be obtained.
+
+2. information
+ 1.1の背景と1.2の目的をまとめる. 
+ 
+3. Background 
+simulated annealing: 
+また, 実験で使用するプログラムについても詳細に説明する. 
+
+ 
+4. previous research q-loss関数とReLUタイプ関数のQUBO形式の導出について説明する.
+4.1 QUBO formulation for q-loss function
+ QUBO formulation is equivalent to the two-body Ising model. 
+ 
+4.2 QUBO formulation for ReLU-type function
+ 
+5 QUBO formulation for l1-norm  導出
+
+5.1 Derivation of l1-norm in QUBO formulation 
+
+5.2 Review of formulation
+
+6. Experimental Setup 実験設定　lassoの正則化項を4.2で導出した式で置き換える
+
+7. Results
+
+7.1 Results on Public Data Sets
+
+8. Conclusion
