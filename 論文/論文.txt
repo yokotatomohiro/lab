@@ -27,7 +27,7 @@ In the anneling results, we verify that the estimate converges to zero.
 論文の構成について説明する.
  
 3. Background 
-Isintg
+Isingモデルについての説明のQUBOについての説明をする. 
 
 simulated annealing: 
 また, 実験で使用するアルゴリズムを書いて詳細に説明する. 
