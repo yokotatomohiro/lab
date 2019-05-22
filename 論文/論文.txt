@@ -31,11 +31,14 @@ Isingモデルについての説明とQUBOについての説明をする.
 In a quantum annealing machine, a physical model called the Ising model is implemented as hardware, which performs annealing at high speed and outputs an approximate optimal solution. 
 The Ising model is represented as follows:
 (イジングモデルの式)
-whe
+where (パラメータについての説明)
+In a QUBO formulation,  
 Since Ising model and QUBO are equivalent, we can converted from one formulation to the other.
 
 
 simulated annealing: 
+Simulated annealing(SA) is optimization algorithm, and it uses minimizes or maximizas the objective function by using the magnitude of energy per point.
+SA 
 また, 実験で使用するアルゴリズムを書いて詳細に説明する. 
  
  Lasso:
