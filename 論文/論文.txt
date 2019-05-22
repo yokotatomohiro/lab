@@ -27,6 +27,9 @@ In the anneling results, we verify that the estimate converges to zero.
 論文の構成について説明する.
  
 3. Background 
+ここでは今回の実験で使用するアルゴリズム, 知識についての説明を行う.
+
+3.1 
 Isingモデルについての説明とQUBOについての説明をする. 
 In a quantum annealing machine, a physical model called the Ising model is implemented as hardware, which performs annealing at high speed and outputs an approximate optimal solution. 
 The Ising model is represented as follows:
@@ -35,13 +38,24 @@ where (パラメータについての説明)
 In a QUBO formulation,  
 Since Ising model and QUBO are equivalent, we can converted from one formulation to the other.
 
-
+3.2
 simulated annealing: 
 Simulated annealing(SA) is optimization algorithm, and it uses minimizes or maximizas the objective function by using the magnitude of energy per point.
-SA 
+SA repeatedly minimizes the objective function by proposing a random move.
+In order to avoid local minima, the random move that do not further minimize the current best solution are not neccessarily rejected, but accepted with a certain probability.
+This probability is proportional to the magnitude of the increase of the objective function in the undesired direction and inversely proportation to the temperature.
+
 また, 実験で使用するアルゴリズムを書いて詳細に説明する. 
  
+ 3.3
  Lasso:
+ Lasso(Least Absolute Shrinkage and Selection Operator) is a method that can estimate regression coefficients sparsely by using l1-norm regularization term.
+ The objective function of Lasso is represented as follows:
+ (Lassoの目的関数の式)
+ where (式のパラメータについての説明)
+ 
+ 3.3.1
+ 
  Lassoについての説明. 特に比較実験をするので座標降下方のアルゴリズムについての説明もする. 
 
  
