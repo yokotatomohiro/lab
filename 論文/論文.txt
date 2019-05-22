@@ -27,7 +27,13 @@ In the anneling results, we verify that the estimate converges to zero.
 論文の構成について説明する.
  
 3. Background 
-Isingモデルについての説明のQUBOについての説明をする. 
+Isingモデルについての説明とQUBOについての説明をする. 
+In a quantum annealing machine, a physical model called the Ising model is implemented as hardware, which performs annealing at high speed and outputs an approximate optimal solution. 
+The Ising model is represented as follows:
+(イジングモデルの式)
+whe
+Since Ising model and QUBO are equivalent, we can converted from one formulation to the other.
+
 
 simulated annealing: 
 また, 実験で使用するアルゴリズムを書いて詳細に説明する. 
