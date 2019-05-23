@@ -60,10 +60,22 @@ This probability is proportional to the magnitude of the increase of the objecti
 
  
 4. previous research q-loss関数とReLUタイプ関数のQUBO形式の導出について説明する.
-4.1 QUBO formulation for q-loss function
- QUBO formulation is equivalent to the two-body Ising model. 
+Here, we explain the formulation of the q-loss function and the ReLU-type function in QUBO, which were conducted in the previous research.
+
+4.1 q-loss function
+The q-loss fucntion proposed by Denchev et al. is expressed as follows:
+(式)
+where (パレメータについての説明)
+In the paper, the binary classifier is used as an example to explain the following advantages.
+In the case of the squared error function, classification is performed by giving no penalty if the classification is correct, and conversely giving a penalty of the square of the error when classification is wrong.
+However, when label noise is present at a point far from the identification boundary, the penalty becomes large and the identification boundary changes significantly.
+One the other hand, in the case of the q-loss function, it is explained that the label nosie prevents the discrimination boundary form largely changing and secures robustness by making the penalty constant.
+When q-loss function is converted to the QUBO form by applying the Legendre transformation, it is derived as follows:
+(式)
+where (式のパラメータについての説明)
+(式) is written in quadratic term about m and t, and the sign fucntion is epressed as a liner term when we employ the binary expansion. 
  
-4.2 QUBO formulation for ReLU-type function
+4.2 ReLU-type function
  
 5 QUBO formulation for l1-norm  導出
 
