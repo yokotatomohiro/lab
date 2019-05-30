@@ -1,1 +1,53 @@
+%\documentclass{jpsj3}
+\documentclass[fp,twocolumn]{jpsj3}
+%\documentclass[letter,twocolumn]{jpsj3}
+%\documentclass[letterpaper,twocolumn]{jpsj3}
+\usepackage{txfonts}
+
+\makealetter
+\@dblfptop 0pt
+\makeatother
+
+\renewcommand{\topfraction}{.85}
+\renewcommand{\bottomfraction}{.60}
+\renewcommand{\textfraction}{.15}
+\renewcommand{\floatpagefraction}{.6}
+
+\title{Derivaton of the QUBO formulation for sparse estimation}
+
+\author{Tomohiro Yokota$^1$%\thanks{jpsj{\_}edit@jps.or.jp}
+  , }
+  
+\inst{}
+
+\abst{In recent years, annealing machine have been developed, and their use methods are considered in fields such as optimization problems and machine learning. In the annealing machine, it is necessary to express the problem to be dealt with in QUBO(Quadratic Unconstrained Binary Optimization) formulation and implement it as hardware. However, since the general method of rewriting to the QUBO format is not known yet, it needs to be derived individually. In this paper, we derive the QUBO formulation for the l1 norm (absolute value function) used in sparse estimation. As a result of experiment, it was possible to predict that one variable could be reduced from the result of numerical experiment by applying the Legendre transformation and Wolf-duality theorem to l1norm. By reviewing the formulation we were actually able to reduce one variable. In addition, as a result of conducting numerical experiments using the derived l1norm, it was confirmed that a sparse solution could be obtained.}
+
+%%% Keywords are not needed any longer. %%%
+%%% \kword{keyword1, keyword2, keyword3, \1dots} 
+%%%
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+\subsection{}
+
+\begin{acknowledgment}
+
+%\acknowledgment
+
+%For enveironments for acknowledgment(s) are available: \verb|acknowledgment|, \verb|acknowledgments|, \verb|acknowledgment|, and \verb|acknowledgments|.
+
+\end{acknowledgment}
+
+%\appndix
+%\section{}
+%Use the \verb|\appendix| command if you need an appendix(es). The \verb|\section| command should follow even though there is no title for the appendix (see above in the source of this file).
+
+
+\end{document}
+
+
+
 
