@@ -52,6 +52,15 @@ where $$. Here, since the Lasso regularizationt term is not continuous, updating
 Coordinate Descent is an algorithm, which updates by repeating the procedure of fixing the values of $p-1$ elements among $p$ parameters and updating only one remaining parameter for all elements.
 
 \section{Derivation of l1-norm in QUBO formulation} %l1-normのQUBOでの定式化
+We define the function $f(m)$ as follows:
+\begin{}
+  f(m)=-\min{(-m,m)}
+\end{}
+A function form of $f(m)$ is shown in Fig. We convert $f(m)$ to quadratic form by applying the Legendre transform to it. Using the method used in the papar[], the one converted to quadratic form is expressed as follows:
+\begin{}
+  F(m)=-\min_{t}{\{-mt\}} \ \text{subject} \ \text{to} \ \-1 \leq t \leq 1
+\end{}
+
 \subsection{Results} %定式化したものを利用して実験を行う
 
 \section{Rewriting derived formula} %定式化の見直し
