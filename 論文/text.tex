@@ -38,18 +38,27 @@ The purpose of this research is to derive an l1-norm, which is a regularization 
 
 \section{Background}
 
-\subsection{QUBO and Ising model}
+\subsection{QUBO and Ising model} %QUBOとIsingモデルについての説明
 
-\subsection{Simulated Annealing algorism}
+\subsection{Simulated Annealing algorism} %実験で利用するSAアルゴリズムについての説明
 
-\subsection{Lasso}
-\subsubsection{Cardininay Decsent}
+\subsection{Lasso} %Lassoについての説明　コスト関数とその特性など
+Lasso(Least Absolute Shrinkage and Selection Operator) is a method to estimate regression coefficients sparsely by using l1-norm regularization terms. The cost function of Lasso is expressed as follows:
+\begin{}
+\end{}
+where $$. Here, since the Lasso regularizationt term is not continuous, updating by partial differentation with respect to parameter $\beta$ can not be obtained. So, in the next section, we will explain how to obtain the update formula of $\beta$ using the Coordinate Descent.
 
-\section{Derivation of l1-norm in QUBO formulation}
-\subsection{Results}
+\subsubsection{Cardininay Decsent} %比較実験で利用するうLassoアルゴリズムについての説明
+Coordinate Descent is an algorithm, which updates by repeating the procedure of fixing the values of $p-1$ elements among $p$ parameters and updating only one remaining parameter for all elements.
 
-\section{Rewriting derived formula}
-\subsectoin{Results}
+\section{Derivation of l1-norm in QUBO formulation} %l1-normのQUBOでの定式化
+\subsection{Results} %定式化したものを利用して実験を行う
+
+\section{Rewriting derived formula} %定式化の見直し
+\subsectoin{Results} %定式化したものを利用して実験を行う
+
+\section{Comparative experiment} %Lassoについて, 比較実験を行う
+\subsection{Results} %その時の比較結果を示し, 
 
 \begin{acknowledgment}
 
