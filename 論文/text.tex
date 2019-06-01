@@ -60,6 +60,14 @@ A function form of $f(m)$ is shown in Fig. We convert $f(m)$ to quadratic form b
 \begin{}
   F(m)=-\min_{t}{\{-mt\}} \ \text{subject} \ \text{to} \ \-1 \leq t \leq 1
 \end{}
+We could express the quadratic form of $f(m)$ as (式), but there is the min function is proceded by a minus sign, which makes it difficult to solve an optimization problem that combines multiple cost functions. Let the other cost function be $C(m)$, and the combination with $F(m)$ is as follows:
+\begin{}
+\end{}
+Hence, it is not in the form of minimization problem for both $m$ and $t$.
+In precious researche [], this problem was solved by applying Wolfe dual theorem to (式). By applying this, the dual problem of $F(m)$ becomes as follows:
+\begin{}
+\end{}
+
 
 \subsection{Results} %定式化したものを利用して実験を行う
 
@@ -69,8 +77,8 @@ The cost function can be transformed as follows using constraint condition.
 \begin{}
 \end{}
 
-
 \subsectoin{Results} %定式化したものを利用して実験を行う
+The result of experimenting the optimization problem under the same experimental conditions as section() with (式) as the objective function is as shown in Fig.(). From this result, we seem that removing the variable $t$ does not affect the result. 
 
 \section{Comparative experiment} %Lassoについて, 比較実験を行う
 \subsection{Results} %その時の比較結果を示し, 
