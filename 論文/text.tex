@@ -41,10 +41,16 @@ In this section, we describes the knowledge and algorithms used in the exeriment
 
 \subsection{QUBO and Ising model} %QUBOとIsingモデルについての説明
 Since the QUBO formulation and the Ising model are equivalent, we can be converted to other form if we can be represented one side. The Ising model is represented as follows:
+\begin{}
+\end{}
+where $\sigma_{i}\in {-1,+1}$is a spin variable for $i$-th spin, $J_{ij}\in \mathbb{R}$ a quadratic term of $i$ and $j$, and $h_{i}\in \mathbb{R}$ a liner term of $i$. We can easily converted the Ising model to QUBO formulation, which uses binary variable $q_{i}\in {0,1}$, by applying $q_{i}=\frac{\sigma_{i}+1}{2}$. 
 
-\subsection{QUBO and Ising model} %QUBOとIsingモデルについての説明t
+\subsection{Simulated Annealing} %実験で利用するSAアルゴリズムについての説明
+Simulated annealing(SA) is optimization algorithm, and it find the minimum of the objective function efficiently. SA repeatedly minimize the objective function by moving the variables randmoly (in this papaer, it moves at a fixed size) at each iteration. Also, it does not necessarily reject non-minimizing movement, but accepts it with a certain acceptance probability. It is possible to avoid convergence to the local minimum. Here, the acceptance probability is inversely proportional to the inverse temperature (execution time) and the size of the energy difference before and after movement. \cite{} show the SA algorithm.
 
-\subsection{Simulated Annealing algorism} %実験で利用するSAアルゴリズムについての説明
+\begin{}
+SA algorithm
+\end{}
 
 \subsection{Lasso} %Lassoについての説明　コスト関数とその特性など
 Lasso(Least Absolute Shrinkage and Selection Operator) is a method to estimate regression coefficients sparsely by using l1-norm regularization terms. The cost function of Lasso is represented as follows:
