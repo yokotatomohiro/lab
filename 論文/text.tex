@@ -74,18 +74,24 @@ We could express the quadratic form of $f(m)$ as (式), but there is the min fun
 \begin{}
 \end{}
 Hence, it is not in the form of minimization problem for both $m$ and $t$.
-In precious researche [], this problem was solved by applying Wolfe dual theorem to (式). By applying this, the dual problem of $F(m)$ becomes as follows:
+In precious researche [], this problem was solved by applying Wolfe dual theorem to (式). By applying this theorem, the dual problem of $F(m)$ is represented as follows:
 \begin{}
+ペナルティ項付きの定式
+subject to 
 \end{}
-
+where M is a constant and take a large value to ensure the equality constraint ($-m-z_{1}+z_{2}=0$) to be satisfied, and the remaining inequality consraints conditions ($-1\leq t\leq 1, z_{1}\geq 0$and$z_{2}\geq 0$) can be easily realized by expanding these variables,$t,z_{1}$and$z_{2}$, in the binary expressions which satisfy the corresponding domain constraints. We will varify in the next section that the (式) is correctly fomulated. 
 
 \subsection{Results} %定式化したものを利用して実験を行う
+In this section, we verify that the formulation is correct by optimizing (式) with SA algorithm. 
 
 \section{Rewriting derived formula} %定式化の見直し
 We can think of the following from the results of the numerical experiments in the previous section: The variable $t$ seems to be taking a random value rather than settling to the optimal value, so we will consider whether we can eliminate $t$ by reviewing the formulation. 
 The cost function can be transformed as follows using constraint condition.
 \begin{}
+\min_{}{} \\
+subject to 
 \end{}
+
 
 \subsectoin{Results} %定式化したものを利用して実験を行う
 The result of experimenting the optimization problem under the same experimental conditions as section() with (式) as the objective function is as shown in Fig.(). From this result, we seem that removing the variable $t$ does not affect the result. 
