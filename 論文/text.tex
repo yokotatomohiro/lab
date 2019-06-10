@@ -3,8 +3,11 @@
 %\documentclass[letter,twocolumn]{jpsj3}
 %\documentclass[letterpaper,twocolumn]{jpsj3}
 \usepackage{txfonts}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsmath}
 
-\makealetter
+\makeatletter
 \@dblfptop 0pt
 \makeatother
 
@@ -43,66 +46,82 @@ In this section, we describes the knowledge and algorithms used in the exeriment
 
 \subsection{QUBO and Ising model} %QUBOとIsingモデルについての説明
 Since the QUBO formulation and the Ising model are equivalent, we can be converted to other form if we can be represented one side. The Ising model is represented as follows:
-\begin{}
-\end{}
-where $\sigma_{i}\in {-1,+1}$is a spin variable for $i$-th spin, $J_{ij}\in \mathbb{R}$ a quadratic term of $i$ and $j$, and $h_{i}\in \mathbb{R}$ a liner term of $i$. We can easily converted the Ising model to QUBO formulation, which uses binary variable $q_{i}\in {0,1}$, by applying $q_{i}=\frac{\sigma_{i}+1}{2}$. 
+\begin{eqnarray}
+  H=-\sum_{i,j}{J_{i,j}\sigma_{i}\sigma_{j}}-\sum_{i}{h_{i}\sigma_{i}}
+\end{eqnarray}
+where $\sigma_{i}\in \{-1,+1\}$is a spin variable for $i$-th spin, $J_{ij}\in \mathbb{R}$ a quadratic term of $i$ and $j$, and $h_{i}\in \mathbb{R}$ a liner term of $i$. We can easily converted the Ising model to QUBO formulation, which uses binary variable $q_{i}\in \{0,1\}$, by applying $q_{i}=\frac{\sigma_{i}+1}{2}$ and QUBO formulation is represented as follows:
+\begin{eqnarray}
+  H=-\sum_{i,j}{\tilde{J}_{i,j}q_{i}q_{j}}-\sum_{i}{\tilde{h}_{i}\sigma_{i}}
+\end{eqnarray}
 
 \subsection{Simulated Annealing} %実験で利用するSAアルゴリズムについての説明
-Simulated annealing(SA) is optimization algorithm, and it find the minimum of the objective function efficiently. SA repeatedly minimize the objective function by moving the variables randmoly (in this papaer, it moves at a fixed size) at each iteration. Also, it does not necessarily reject non-minimizing movement, but accepts it with a certain acceptance probability. It is possible to avoid convergence to the local minimum. Here, the acceptance probability is inversely proportional to the inverse temperature (execution time) and the size of the energy difference before and after movement. \cite{} show the SA algorithm.
+Simulated annealing(SA) is optimization algorithm, and it find the minimum of the objective function efficiently. SA repeatedly minimize the objective function by moving the variables randmoly (in this papaer, it moves at a fixed size) at each iteration. Also, it does not necessarily reject non-minimizing movement, but accepts it with a certain acceptance probability. It is possible to avoid convergence to the local minimum. Here, the acceptance probability is inversely proportional to the inverse temperature (execution time) and the size of the energy difference before and after movement. Table.\ref{SA_algorithm} show the SA algorithm.
 
 %シミュレーテッドアルゴリズムの図
-\begin{}
-Algorithm : Simulated Annealing 
-input: variables m, t(-1 \leq t \leq 1), z_{1}(z_{1} \geq 0), z_{2}(z_{2} \geq 0), number of steps t_{max}, initial random state with -10 \leq m \leq 10, -1 \leq t \leq 1, 0 \leq z_{1},z_{2} \leq 10 
-output: m,t,z_{1},z_{2} of local minimum
-
-for t \leftarray 1 to t_{max} do
-  Evaluate the cost L(m,t,z_{1},z_{2}) at the current state 
-  Let m',z_{1}' and z_{2}' be random move of m,z_{1} and z_{2} and evaluate the after random move cost L(m,t',z_{1}',z_{2}')
-  \Delta \leftarray L(m,t',z_{1}',z_{2}') - L(m,t,z_{1},z_{2})
-  p \leftarray \exp{(\Delta/T(t))
-  Update m,z_{1} and z_{2} to m'z_{1}' and z_{2}' with probability min(1,p), otherwise do not update
-end 
-return m,t,z_{1},z_{2}
-\end{}
+\begin{algorithm}
+  \caption{Simulated Annealing} \label{SA_algorithm}
+  \begin{algorithmic}[1]
+    \REQUIRE variables $m, t, z_{1}, z_{2}$, number of steps $count_{max}$, initial random state with $-10\leq m\leq 10, -1\leq t\leq 1, 0\leq z_{1}\leq 10$ and $0\leq z_{2}\leq 10$ 
+    \ENSURE  $m, t, z_{1}, z_{2}$ of local minimum
+    \FOR{$count\leftarrow 1$ to $count_{max}$}
+    \STATE Evaluate the cost $L(m, t, z_{1}, z_{2})$ at the current state
+    \STATE Let $t', z_{1}'$ and $z_{2}'$ be random move of $t,z_{1}$ and $z_{2}$ and evaluate the cost $L(m,t',z_{1}', z_{2}')$
+    \STATE $\Delta \leftarrow L(m,t',z_{1}',z_{2}') - L(m,t,z_{1},z_{2})$
+    \STATE $p\leftarrow \exp{(\Delta /T(count))}$
+    \STATE Update $t,z_{1},z_{2}$ to $t',z_{1}',z_{2}'$with probability $\min{(1,p)}$, otherwise do not update
+    \ENDFOR
+  \end{algorithmic}
+\end{algorithm}
 
 \section{Derivation of l1-norm in QUBO formulation} %l1-normのQUBOでの定式化
 We define the function $f(m)$ as follows:
-\begin{}
+\begin{eqnarray}
   f(m)=-\min{(-m,m)}
-\end{}
+\end{eqnarray}
 A function form of $f(m)$ is shown in Fig. We convert $f(m)$ to quadratic form by applying the Legendre transform to it. Using the method used in the papar[], the one converted to quadratic form is represented as follows:
-\begin{}
-  F(m)=-\min_{t}{\{-mt\}} \ \text{subject} \ \text{to} \ \-1 \leq t \leq 1
-\end{}
+\begin{eqnarray}
+  F(m)=-\min_{t}{\{-mt\}} \quad \text{subject to} \quad \-1 \leq t \leq 1
+\end{eqnarray}
 We could express the quadratic form of $f(m)$ as (式), but there is the min function is proceded by a minus sign, which makes it difficult to solve an optimization problem that combines multiple cost functions. Let the other cost function be $C(m)$, and the combination with $F(m)$ is as follows:
-\begin{}
-\end{}
+\begin{eqnarray}
+  \min_{m}{\{C(m)+F(m)\}} &=& \min_{m}\left\{C(m)-\min_{t}{\{-mt\}}\right\} \nonumber \\
+  &\neq & \min_{m,t}{\left\{C(m)-(-mt)\right\}} \nonumber 
+\end{eqnarray}
 Hence, it is not in the form of minimization problem for both $m$ and $t$.
-In precious researche [], this problem was solved by applying Wolfe dual theorem to (式). By applying this theorem, the dual problem of $F(m)$ is represented as follows:
-\begin{}
-ペナルティ項付きの定式
-subject to 
-\end{}
-where M is a constant and take a large value to ensure the equality constraint ($-m-z_{1}+z_{2}=0$) to be satisfied, and the remaining inequality consraints conditions ($-1\leq t\leq 1, z_{1}\geq 0$and$z_{2}\geq 0$) can be easily realized by expanding these variables,$t,z_{1}$and$z_{2}$, in the binary expressions which satisfy the corresponding domain constraints. We will varify in the next section that the (式) is correctly fomulated. 
+In precious researche [], this problem was solved by applying Wolfe dual theorem to (式). By applying this theorem, the dual problem of the optimization problem (\ref{}) is represented as follows:
+\begin{eqnarray}
+  \left\{
+  \begin{array}{ll}
+    maximize_{t,z_{1},z_{2}} & -mt-z_{1}(t+1)+z_{2}(t-1) \\
+    \text{subject to} & -m-z_{1}+z_{2}=0,  \\
+    & -1\leq t\leq 1, z_{1}\geq 0, z_{2}\geq 0 \label{wolf}
+  \end{array}
+  \right.
+\end{eqnarray}
+In order to remove the equality constraint ($-m-z_{1}+z_{2}=0$), it is enough to add the following penalty term of the square of it. Therefore, the optimization problem (\ref{wolf}) can be represented as follows:
+\begin{eqnarray}
+  \left\{
+  \begin{array}{ll}
+    minimize_{t,z_{1},z_{2}} & mt+z_{1}(t+1)-z_{2}(t-1)+M(-m-z_{1}+z_{2})^{2} \\
+    \text{subject to} & -1\leq t\leq 1, z_{1}\geq 0, z_{2}\geq 0 \label{after_wolf}
+  \end{array}
+  \right.
+\end{eqnarray}
+where M is a constant and take a large value to ensure the equality constraint ($-m-z_{1}+z_{2}=0$) to be satisfied, and the remaining inequality consraints conditions ($-1\leq t\leq 1, z_{1}\geq 0$ and $z_{2}\geq 0$) can be easily realized by expanding these variables,$t,z_{1}$ and $z_{2}$, in the binary expressions which satisfy the corresponding domain constraints. We will varify in the next section that the (\ref{after_wolf}) is correctly fomulated. 
 
 \subsection{Results} %定式化したものを利用して実験を行う
-In this section, we verify that the formulation is correct by optimizing (式) with SA algorithm. We give details of the parameters below.
-\begin{items}
-\item 
-\item 
-\end{items}
+In this section, we verify that the formulation is correct by optimizing problem (\ref{after_wolf}) with SA algorithm\ref{SA_algorithm}. 
 
 \section{Rewriting derived formula} %定式化の見直し
 We can think of the following from the results of the numerical experiments in the previous section: The variable $t$ seems to be taking a random value rather than settling to the optimal value, so we will consider whether we can eliminate $t$ by reviewing the formulation. 
 The cost function can be transformed as follows using constraint condition.
-\begin{}
-\min_{}{} \\
+\begin{eqnarray}
+\min \\
 subject to 
-\end{}
+\end{eqnarray}
 
 
-\subsectoin{Results} %定式化したものを利用して実験を行う
+\subsection{Results} %定式化したものを利用して実験を行う
 The result of experimenting the optimization problem under the same experimental conditions as section() with (式) as the objective function is as shown in Fig.(). From this result, we seem that removing the variable $t$ does not affect the result. 
 
 \begin{acknowledgment}
@@ -129,7 +148,5 @@ The result of experimenting the optimization problem under the same experimental
 \end{thebibliography}
 
 \end{document}
-
-
 
 
