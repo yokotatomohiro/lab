@@ -16,9 +16,11 @@
 \title{Derivaton of the QUBO formulation for sparse estimation}
 
 \author{Tomohiro Yokota$^1$%\thanks{jpsj{\_}edit@jps.or.jp}
-  , }
-  
-\inst{}
+  , Jun Ohkubo$^1$, Makiko Konoshima$^2$, Hirotaka Tamura$^2$}
+\inst{$^1$Graduate School of Science and Enginnering, Saitama University,
+  255 Shimo-Okubo, Sakura-ku, Saitama-shi, 338-8570, Japan\\
+$^2$Fujitsu Laboratories Ltd.,
+4-1-1 Kawasaki, Kanagawa 211-8558, Japan} %\\
 
 \abst{In recent years, annealing machine have been developed, and their use methods are considered in fields such as optimization problems and machine learning. In the annealing machine, it is necessary to express the problem to be dealt with in QUBO(Quadratic Unconstrained Binary Optimization) formulation and implement it as hardware. 
 However, since the general method of rewriting to the QUBO format is not known yet, it needs to be derived individually. In this paper, we derive the QUBO formulation for the l1 norm (absolute value function) used in sparse estimation. As a result of experiment, it was possible to predict that one variable could be reduced from the result of numerical experiment by applying the Legendre transformation and Wolf-duality theorem to l1norm. By reviewing the formulation we were actually able to reduce one variable. In addition, as a result of conducting numerical experiments using the derived l1norm, it was confirmed that a sparse solution could be obtained.}
