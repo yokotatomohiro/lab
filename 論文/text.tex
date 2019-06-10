@@ -52,15 +52,6 @@ Simulated annealing(SA) is optimization algorithm, and it find the minimum of th
 SA algorithm
 \end{}
 
-\subsection{Lasso} %Lassoについての説明　コスト関数とその特性など
-Lasso(Least Absolute Shrinkage and Selection Operator) is a method to estimate regression coefficients sparsely by using l1-norm regularization terms. The cost function of Lasso is represented as follows:
-\begin{}
-\end{}
-where $$. Here, since the Lasso regularizationt term is not continuous, updating by partial differentation with respect to parameter $\beta$ can not be obtained. So, in the next section, we will explain how to obtain the update formula of $\beta$ using the Coordinate Descent.
-
-\subsubsection{Cardininay Decsent} %比較実験で利用するうLassoアルゴリズムについての説明
-Coordinate Descent is an algorithm, which updates by repeating the procedure of fixing the values of $p-1$ elements among $p$ parameters and updating only one remaining parameter for all elements.
-
 \section{Derivation of l1-norm in QUBO formulation} %l1-normのQUBOでの定式化
 We define the function $f(m)$ as follows:
 \begin{}
@@ -99,9 +90,6 @@ subject to
 
 \subsectoin{Results} %定式化したものを利用して実験を行う
 The result of experimenting the optimization problem under the same experimental conditions as section() with (式) as the objective function is as shown in Fig.(). From this result, we seem that removing the variable $t$ does not affect the result. 
-
-\section{Comparative experiment} %Lassoについて, 比較実験を行う
-\subsection{Results} %その時の比較結果を示し, 
 
 \begin{acknowledgment}
 
