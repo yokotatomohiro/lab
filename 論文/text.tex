@@ -48,8 +48,20 @@ where $\sigma_{i}\in {-1,+1}$is a spin variable for $i$-th spin, $J_{ij}\in \mat
 \subsection{Simulated Annealing} %実験で利用するSAアルゴリズムについての説明
 Simulated annealing(SA) is optimization algorithm, and it find the minimum of the objective function efficiently. SA repeatedly minimize the objective function by moving the variables randmoly (in this papaer, it moves at a fixed size) at each iteration. Also, it does not necessarily reject non-minimizing movement, but accepts it with a certain acceptance probability. It is possible to avoid convergence to the local minimum. Here, the acceptance probability is inversely proportional to the inverse temperature (execution time) and the size of the energy difference before and after movement. \cite{} show the SA algorithm.
 
+%シミュレーテッドアルゴリズムの図
 \begin{}
-SA algorithm
+Algorithm : Simulated Annealing 
+input: variables m, t(-1 \leq t \leq 1), z_{1}(z_{1} \geq 0), z_{2}(z_{2} \geq 0), number of steps t_{max}, initial random state with -10 \leq m \leq 10, -1 \leq t \leq 1, 0 \leq z_{1},z_{2} \leq 10 
+output: m,t,z_{1},z_{2} of local minimum
+
+for t \leftarray 1 to t_{max} do
+  Evaluate the cost L(m,t,z_{1},z_{2}) at the current state 
+  Let m',z_{1}' and z_{2}' be random move of m,z_{1} and z_{2} and evaluate the after random move cost L(m,t',z_{1}',z_{2}')
+  \Delta \leftarray L(m,t',z_{1}',z_{2}') - L(m,t,z_{1},z_{2})
+  p \leftarray \exp{(\Delta/T(t))
+  Update m,z_{1} and z_{2} to m'z_{1}' and z_{2}' with probability min(1,p), otherwise do not update
+end 
+return m,t,z_{1},z_{2}
 \end{}
 
 \section{Derivation of l1-norm in QUBO formulation} %l1-normのQUBOでの定式化
