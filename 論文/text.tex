@@ -78,7 +78,7 @@ Simulated annealing(SA) is optimization algorithm, and it find the minimum of th
 \subsection{Lasso}
 Lasso(Least Absolute Shrinkage and Selection Operator) is a method to estimate regression coefficients sparsely by using l1-norm regularization terms. The cost function of Lasso is represented as follows:
 \begin{eqnarray}
-  \frac{1}{2n}*\|\|y-Xw\|\|^{2}_{2} + alpha\|\|w\|\|_{1}
+  \frac{1}{2n}*\|y-Xw\|^{2}_{2} + \alpha\|w\|_{1}
 \end{eqnarray}
 where $ $. Here, since the Lasso regularization term is not continuous, updating by partial differentation with respect to parameter $\alpha$ can not be obtain. So, in the next section, we will explain how to obtain the update formula of $alpha$ using the Coordinate Descent.
 
