@@ -67,7 +67,34 @@ where $\sigma_{i}\in \{-1,+1\}$is a spin variable for $i$-th spin, $J_{ij}\in \m
   H=-\sum_{i,j}{\tilde{J}_{i,j}q_{i}q_{j}}-\sum_{i}{\tilde{h}_{i}\sigma_{i}}
 \end{eqnarray}
 
-\subsection{}
+\subsection{previous research}
+この節では先行研究で行われたq-loss関数とReLUタイプ関数のQUBO形式について記載する.
+
+q-loss関数のコスト関数は次のように表される.
+\begin{eqnarray}
+  L_{q}(m)=\min{[(1-q)^{2}, (\max{[0,1-m]})^{2}]} \label{q-loss_function}
+\end{eqnarray}
+ここで, $q\in (\infty,0]$はパラメータであり, $m$は実変数である. 式(\ref{q-loss_function})に対してLegendre変換を適用することで次のように変換できる.
+\begin{eqnarray}
+  L_{q}(m)=\min_{t}{\left\{(m-t)^{2}+(1-q)^{2}\frac{(1-\text{sign}(t-1))}{2}\right\}} \label{q-loss_function_legendre}
+\end{eqnarray}
+
+ReLUタイプ関数のコスト関数は次のように表される.
+\begin{eqnarray}
+  f(m)=-\min{(0,m)} \label{ReLU_function}
+\end{eqnarray}
+式(\ref{ReLU_function})に対してLegendre変換を適用することで次のように変換できる.
+\begin{eqnarray}
+  f(m)=-\min_{t}{\{-mt\}} \quad \text{subject to} \quad -1\leq t\leq 0 \label{ReLU_function_legendre}
+\end{eqnarray}
+ここで, 式(\ref{ReLU_function_legendre})の$\min$関数にマイナス符号が付いているため, 複数のコスト関数と組み合わせた最適化問題を解くこと困難である. そこで, 式(\ref{ReLU_function_lengendre})に対して, Wolfeの双対定理を適用する. wolfeの双対定理については次の節で説明を行う.
+\begin{eqnarray}
+  f(m)=\min_{t,z_{1},z_{2}}{\{mt+z_{1}(t+1)-z_{2}t-M(-m-z_{1}+z_{2})^{2}\}} \label{ReLU_function_wolfe}
+\end{eqnarray}
+ここで, $M$は大きな正の定数である.
+式(\ref{q-loss_function_legendre}),(ReLU_function_wolfe)について, 二進数展開をすることでQUBO形式を導出することができる.
+
+\subsection{Wolfe-duality}
 
 \subsection{Simulated Annealing} %実験で利用するSAアルゴリズムについての説明
 Simulated annealing(SA) is optimization algorithm, and it find the minimum of the objective function efficiently. SA repeatedly minimize the objective function by moving the variables randmoly (in this papaer, it moves at a fixed size) at each iteration. Also, it does not necessarily reject non-minimizing movement, but accepts it with a certain acceptance probability. It is possible to avoid convergence to the local minimum. Here, the acceptance probability is inversely proportional to the inverse temperature (execution time) and the size of the energy difference before and after movement. Algorithm.\ref{alg:SA} show the SA algorithm. We uses the temperature function $T(n+1)=\alpha T(n) (0<\alpha <1)$ and run the SA algorithm until the temperature becomes small.
