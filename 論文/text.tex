@@ -89,13 +89,33 @@ ReLUタイプ関数のコスト関数は次のように表される.
 ここで, $M$は大きな正の定数である.
 式(\ref{q-loss_function_legendre}),(ReLU_function_wolfe)について, 二進数展開をすることでQUBO形式を導出することができる.
 
-\subsection{Wolfe-duality}
-W
-
-\section{Derivation of l1-norm in QUBO formulation} %l1-normのQUBOでの定式化
-We define the function $f(m)$ as follows:
+\subsection{Wolfe-duality} \label{sec:wolfe}
+Wolfeの双対定理は不等式制約を持つ最大化問題の双対問題を導出することができる. 次のような制約を持つ最適化問題を考える.
+\begin{equation}
+  \left\{
+  \text{minimize}_{x} \ f_{W}(x) \quad (x\in\mathbb{R}^{n}),\\
+  \text{subject to} \ h_{i}(x)\leq 0 \ (i=1,2,\dots,l). \label{object_function}
+  \end{aligned}
+  \right.
+\end{equation}
+ここで$f_{W}(x)$の最適化したいある凸関数であり, $h_{i}$は凸な不等式制約である. 最適化問題のラグランジュ関数は次のように表される.
 \begin{eqnarray}
-  f(m)=-\min{(-m,m)}
+  L(x,z)=f_{W}(x)+z^{T}h(x),
+\end{eqnarray}
+ここで$z$はラグランジュ係数のベクトルである. このとき, Wolfeの双対定理により式(\ref{object_function})の最適化問題は次の最大化問題と等価である.
+\begin{equation}
+  \text{maximize}_{x,z} \ L(x,z) \quad ((x,z)\in \mathbb{R}^{n}\times\mathbb{R}^{l}),\\
+  \text{subject to} \nabla L(x,z)=0 \ (z \geq 0). 
+\end{equation}
+上記に示すように, Wolfeの双対定理は最適化問題を最大化問題に変換する. 
+
+\section{Naive derivation of QUBO formulation for \ell{l}_{1}-norm}
+この章では絶対値関数のQUBO形式での定式化を行う.
+\ref{sec:wolfe}章で説明したWolfeの双対定理を式(\ref{})
+\subsection{QUBO formulation}
+絶対値関数$f(m)$は次のように定義される.
+\begin{eqnarray}
+  f(m)=-\min{-m,m} \label{l1-norm}
 \end{eqnarray}
 \begin{figure}[htbp]
   \begin{center}
@@ -104,7 +124,7 @@ We define the function $f(m)$ as follows:
     \label{fig:absolute}
   \end{center}
 \end{figure}
-A function form of $f(m)$ is shown in Fig.\ref{fig:absolute}. We convert $f(m)$ to quadratic form by applying the Legendre transform to it. Using the method used in the papaer, the one converted to quadratic form is represented as follows:
+$f(m)$の概形は図(\ref{fig:absolute})のようになる. また, 式(\ref{l1-norm})に対してLegendre変換を行うと次のように変換できる. 
 \begin{eqnarray}
   F(m)=-\min_{t}{\{-mt\}} \quad \text{subject to} \quad \-1 \leq t \leq 1 \label{legendre}
 \end{eqnarray}
@@ -116,7 +136,7 @@ We could express the quadratic form of $f(m)$ as (\ref{legendre}), but there is 
 Hence, it is not in the form of minimization problem for both $m$ and $t$.
 In precious researche \cite{relu}, this problem was solved by applying Wolfe dual theorem to (\ref{legendre}). By applying this theorem, the dual problem of the optimization problem (\ref{legendre}) is represented as follows:
 \begin{eqnarray}
-  F'(m)=\max_{t,z_{1},z_{2}}{\{-mt-z_{1}(t+1)+z_{2}(t-1)} \label{wolf}
+  \widetilde{F}(m)=\max_{t,z_{1},z_{2}}{\{-mt-z_{1}(t+1)+z_{2}(t-1)} \label{wolf}
 \end{eqnarray}
 \begin{equation}
   \text{subject to} \quad \left\{
@@ -129,10 +149,16 @@ In precious researche \cite{relu}, this problem was solved by applying Wolfe dua
 In order to remove the equality constraint ($-m-z_{1}+z_{2}=0$), it is enough to add the following penalty term of the square of it. Therefore, the optimization problem (\ref{wolf}) can be represented as follows:
 \begin{equation}
   \begin{aligned}
-    F'(m)&=\min_{t,z_{1},z_{2}}{\{mt+z_{1}(t+1)-z_{2}(t-1)} \\
+    \widetilde{F}(m)&=\min_{t,z_{1},z_{2}}{\{mt+z_{1}(t+1)-z_{2}(t-1)} \\
     &\quad+M(-m-z_{1}+z_{2})^{2}\} \label{after_wolf} \\
   \end{aligned}
 \end{equation}
+
+\subsection{Numerical validation}
+
+\section{Derivation of l1-norm in QUBO formulation} %l1-normのQUBOでの定式化
+We define the function $f(m)$ as follows:
+
 \begin{eqnarray}
   \text{subject to} \quad -1\leq t\leq 1, z_{1}\geq 0, z_{2}\geq 0 \nonumber
   \end{eqnarray}
