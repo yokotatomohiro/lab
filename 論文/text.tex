@@ -39,11 +39,6 @@ l1-normのQUBO形式での定式化を提案する. これにより, スパー�
 \maketitle
 
 \section{Introduction}
-In recent yeaars, sepecial machines for annealing have benn developed such as D-Wave Systems Inc.'s D-Wave\cite{d-wave01, d-wave02} and Fujitsu's Digital Annealer\cite{DA} and methods for use in various fields are being considered. The annealing machine acceptes Ising model parameters as input, but there are many functions thathave been represented yet because systematic derivation of the Ising model has been shown.
-In the previous researches, the robust q-loss function is derived in the QUBO form using the Legendre transform\cite{q-loss}, and its performance is evaluated using the classification problem as an example. Also, in the recently published papaer on the derivation of the ReLU function in the QUBO form\cite{relu}, the derivation has made using the Wolfe-duality theorem\cite{wolfe}, so that the Legendre transformation alone is insufficient.
-On the other hand, sparse estimation is used in the fields of image processing and machine learning, and it is an important research in reducing the number of data, selecting related data from high-dimensional and complex data and making it simple.
-The purpose of this research is to derive an l1-norm, which is a regularization term of Lasso\cite{lasso} used in sparse estimation, in the QUBO form using the derivation method in \cite{relu}. Furthemore, we evaluate whether the derived result is correct using simulated anneaing.
-
 近年では, D-Wave Systems Inc.のD-Waveや富士通のデジタルアニーラのようなイジング型マシンの開発が進められている. 利用できる量子ビット数が年々増加しており, これにより大きな組み合わせ最適化問題に対してイジング型マシンでの計算ができるようになった. しかし, イジング型マシンで最適化問題を計算するためには, コスト関数をQUBO形式に変換しハードウェアとして実装する必要があるが, その系統的な導出方法はまだ見つかっていない. 
 
 先行研究ではq-loss関数とReLUタイプ関数のQUBO形式での導出がされている. q-loss関数の導出法についてはLegendre変換を適用することでQUBO形式を導出することができた. しかし, ReLUタイプ関数に対しては, q-loss関数の導出法と同様にLegendre変換だけを適用した場合, コスト関数のmin関数にマイナス符号がついてしまっている. これによりReLUタイプ関数を他のコスト関数を組み合わせた最適化問題を解くことが困難になる. そこで, Wolfeの双対定理を適用した. 
@@ -87,7 +82,7 @@ ReLUタイプ関数のコスト関数は次のように表される.
 \begin{eqnarray}
   f(m)=-\min_{t}{\{-mt\}} \quad \text{subject to} \quad -1\leq t\leq 0 \label{ReLU_function_legendre}
 \end{eqnarray}
-ここで, 式(\ref{ReLU_function_legendre})の$\min$関数にマイナス符号が付いているため, 複数のコスト関数と組み合わせた最適化問題を解くこと困難である. そこで, 式(\ref{ReLU_function_lengendre})に対して, Wolfeの双対定理を適用する. wolfeの双対定理については次の節で説明を行う.
+ここで, 式(\ref{ReLU_function_legendre})の$\min$関数にマイナス符号が付いているため, 複数のコスト関数と組み合わせた最適化問題を解くこと困難である. そこで, 式(\ref{ReLU_function_lengendre})に対して, Wolfeの双対定理を適用する. wolfeの双対定理の詳細については次の節で説明を行う.
 \begin{eqnarray}
   f(m)=\min_{t,z_{1},z_{2}}{\{mt+z_{1}(t+1)-z_{2}t-M(-m-z_{1}+z_{2})^{2}\}} \label{ReLU_function_wolfe}
 \end{eqnarray}
@@ -95,36 +90,7 @@ ReLUタイプ関数のコスト関数は次のように表される.
 式(\ref{q-loss_function_legendre}),(ReLU_function_wolfe)について, 二進数展開をすることでQUBO形式を導出することができる.
 
 \subsection{Wolfe-duality}
-
-\subsection{Simulated Annealing} %実験で利用するSAアルゴリズムについての説明
-Simulated annealing(SA) is optimization algorithm, and it find the minimum of the objective function efficiently. SA repeatedly minimize the objective function by moving the variables randmoly (in this papaer, it moves at a fixed size) at each iteration. Also, it does not necessarily reject non-minimizing movement, but accepts it with a certain acceptance probability. It is possible to avoid convergence to the local minimum. Here, the acceptance probability is inversely proportional to the inverse temperature (execution time) and the size of the energy difference before and after movement. Algorithm.\ref{alg:SA} show the SA algorithm. We uses the temperature function $T(n+1)=\alpha T(n) (0<\alpha <1)$ and run the SA algorithm until the temperature becomes small.
-
-%シミュレーテッドアルゴリズムの図
-\begin{algorithm}
-  \caption{Simulated Annealing}
-  \begin{algorithmic}[1]
-    \REQUIRE variables $m, t, z_{1}, z_{2}$, initila temperature $T_{0}$, lower limit temperature $T_{limit}$, initial random state with $-10\leq m\leq 10, -1\leq t\leq 1, 0\leq z_{1}\leq 10$ and $0\leq z_{2}\leq 10$ 
-    \ENSURE  $t, z_{1}, z_{2}$ of local minimum when $m$ is given.
-    \FOR{$n\leftarrow 1$ to $T(n)<T_{limite}$}
-    \STATE Evaluate the cost $L(m, t, z_{1}, z_{2})$ at the current state
-    \STATE Let $t', z_{1}'$ and $z_{2}'$ be random move of $t,z_{1}$ and $z_{2}$ and evaluate the cost $L(m,t',z_{1}', z_{2}')$
-    \STATE $\Delta \leftarrow L(m,t',z_{1}',z_{2}') - L(m,t,z_{1},z_{2})$
-    \STATE $p\leftarrow \exp{(\Delta /T(count))}$
-    \STATE Update $t,z_{1},z_{2}$ to $t',z_{1}',z_{2}'$with probability $\min{(1,p)}$, otherwise do not update
-    \ENDFOR
-  \end{algorithmic}
-  \label{alg:SA}
-\end{algorithm}
-
-\subsection{Lasso}
-Lasso(Least Absolute Shrinkage and Selection Operator) is a method to estimate regression coefficients sparsely by using l1-norm regularization terms. The cost function of Lasso is represented as follows:
-\begin{eqnarray}
-  \frac{1}{2n}*\|y-Xw\|^{2}_{2} + \alpha\|w\|_{1}
-\end{eqnarray}
-where $ $. Here, since the Lasso regularization term is not continuous, updating by partial differentation with respect to parameter $\alpha$ can not be obtain. So, in the next section, we will explain how to obtain the update formula of $alpha$ using the Coordinate Descent.
-
-\subsubsection{Coordinate descent}
-Coordinate Descent is an algorithm, which updates by repeating the procedure of fixing the values of $p-1$ elements among $p$ parameters and updating only one remaining parameter for all elements.
+W
 
 \section{Derivation of l1-norm in QUBO formulation} %l1-normのQUBOでの定式化
 We define the function $f(m)$ as follows:
