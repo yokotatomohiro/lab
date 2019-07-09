@@ -26,7 +26,7 @@
 $^2$Fujitsu Laboratories Ltd.,
 4-1-1 Kawasaki, Kanagawa 211-8558, Japan} %\\
 
-\abst{In recent years, annealing machine have been developed, and their use methods are considered in fields such as optimization problems and machine learning. In the annealing machine, it is necessary to express the problem to be dealt with in QUBO(Quadratic Unconstrained Binary Optimization) formulation and implement it as hardware. However, since the general method of rewriting to the QUBO format is not known yet, it needs to be derived individually. In this paper, we derive the QUBO formulation for the l1-norm (absolute value function) used in sparse estimation. As a result of experiment, it was possible to predict that one variable could be reduced from the result of numerical experiment by applying the Legendre transformation and Wolf-duality theorem to l1norm. By reviewing the formulation we were actually able to reduce one variable.
+\abst{%In recent years, annealing machine have been developed, and their use methods are considered in fields such as optimization problems and machine learning. In the annealing machine, it is necessary to express the problem to be dealt with in QUBO(Quadratic Unconstrained Binary Optimization) formulation and implement it as hardware. However, since the general method of rewriting to the QUBO format is not known yet, it needs to be derived individually. In this paper, we derive the QUBO formulation for the l1-norm (absolute value function) used in sparse estimation. As a result of experiment, it was possible to predict that one variable could be reduced from the result of numerical experiment by applying the Legendre transformation and Wolf-duality theorem to l1norm. By reviewing the formulation we were actually able to reduce one variable.
 
 l1-normのQUBO形式での定式化を提案する. これにより, スパース推定に対するQUBO形式を導出することができるようになる. Sato et al.(2019)が提案したReLUタイプ関数の定式化の方法を応用することで, l1-normのQUBO形式での導出を行なった. 加えて, 数値実験を通して, 定式を見直すことにより変数を減らすことができた. 
 }
@@ -41,16 +41,16 @@ l1-normのQUBO形式での定式化を提案する. これにより, スパー�
 \section{Introduction}
 近年では, D-Wave Systems Inc.のD-Waveや富士通のデジタルアニーラのようなイジング型マシンの開発が進められている. 利用できる量子ビット数が年々増加しており, これにより大きな組み合わせ最適化問題に対してイジング型マシンでの計算ができるようになった. しかし, イジング型マシンで最適化問題を計算するためには, コスト関数をQUBO形式に変換しハードウェアとして実装する必要があるが, その系統的な導出方法はまだ見つかっていない. 
 
-先行研究ではq-loss関数とReLUタイプ関数のQUBO形式での導出がされている. q-loss関数の導出法についてはLegendre変換を適用することでQUBO形式を導出することができた. しかし, ReLUタイプ関数に対しては, q-loss関数の導出法と同様にLegendre変換だけを適用した場合, コスト関数のmin関数にマイナス符号がついてしまっている. これによりReLUタイプ関数を他のコスト関数を組み合わせた最適化問題を解くことが困難になる. そこで, Wolfeの双対定理を適用した. 
+先行研究ではq-loss関数とReLUタイプ関数のQUBO形式での導出がされている. q-loss関数の導出法についてはLegendre変換を適用することでQUBO形式を導出することができた. しかし, ReLUタイプ関数に対しては, Legendre変換だけを適用しただけではコスト関数のmin関数にマイナス符号がついてまう. これによりReLUタイプ関数を他のコスト関数を組み合わせて最適化問題を解くことが困難になる. そこで, Wolfeの双対定理を適用された. 
 
-本稿で紹介するl1-normはスパース推定を行う際に利用されている. スパース推定はデータ解析や画像処理の分野で利用されている. データ解析ではスパース推定を用いることで解がスパースになる. この考え方は, ブラックホールの解析でも利用されている. ブラックホールとても小さく, 今までの手法では解像度が低いため観測することが不可能であった. そこで, 世界中の電波望遠鏡から同時に測定を行い, その観測データに対してスパース推定を行うことで本質的な情報のみを取り出しブラックホールの画像化を行なった. ここで, l1-normのQUBO形式での導出はまだされておらず, イジング型マシンを用いたスパース推定を行う上でこの研究は重要である.
+本稿で紹介するl1-normはスパース推定を行う際に利用されている. スパース推定はデータ解析や画像処理の分野で利用されている. データ解析ではスパース推定を用いることで解がスパースになる. この考え方は, ブラックホールの解析でも利用されている. ブラックホールとても小さく, 今までの手法では解像度が低いため観測することが不可能であった. そこで, 世界中の電波望遠鏡から同時に測定を行い, その観測データに対してスパース推定を行うことで本質的な情報のみを取り出しブラックホールの画像化を行なった. したがって, スパース推定をイジング型マシンで行う上でこの研究は重要である.
 
 本稿ではl1-normのQUBO形式での定式化を行う. そのために, Legendre変換およびWolfeの双対定理を用いる. さらに, 定式化を見直すことで, 単純に適用した場合よりも変数を減らせることが確認できた. これはイジング型マシンの量子ビット数に制限がある現在において, ハードウェアへの実装を考える上で重要なことである. 
 
 構成について
 
 \section{Background}
-In this section, we describes the knowledge and algorithms used in the exeriment.
+In this section, we describes the knowledge.
 
 \subsection{QUBO and Ising model} %QUBOとIsingモデルについての説明
 Since the QUBO formulation and the Ising model are equivalent, we can be converted to other form if we can be represented one side. The Ising model is represented as follows:
@@ -109,7 +109,7 @@ Wolfeの双対定理は不等式制約を持つ最大化問題の双対問題を
 \end{equation}
 上記に示すように, Wolfeの双対定理は最適化問題を最大化問題に変換する. 
 
-\section{Naive derivation of QUBO formulation for \ell{l}_{1}-norm}
+\section{Naive derivation of QUBO formulation for $\ell{l}_{1}$-norm}
 この章では絶対値関数のQUBO形式での定式化を行う.
 \ref{sec:wolfe}章で説明したWolfeの双対定理を式(\ref{})
 \subsection{QUBO formulation}
@@ -153,16 +153,41 @@ In order to remove the equality constraint ($-m-z_{1}+z_{2}=0$), it is enough to
     &\quad+M(-m-z_{1}+z_{2})^{2}\} \label{after_wolf} \\
   \end{aligned}
 \end{equation}
+\begin{eqnarray}
+  \text{subject to} \quad -1\leq t\leq 1, z_{1}\geq 0, z_{2}\geq 0 \nonumber
+\end{eqnarray}
+where M is a constant and take a large value to ensure the equality constraint ($-m-z_{1}+z_{2}=0$) to be satisfied, and the remaining inequality consraints conditions ($-1\leq t\leq 1, z_{1}\geq 0$ and $z_{2}\geq 0$) can be easily realized by expanding these variables $t,z_{1}$ and $z_{2}$, in the binary expressions which satisfy the corresponding domain constraints. We will varify in the next section that the (\ref{after_wolf}) is correctly fomulated. 
 
 \subsection{Numerical validation}
+In this section, we verify that the formulation is correct by optimizing problem (\ref{after_wolf}) with SA Algorithm. 今回の数値実験の目的は導出された定式化の確認なので式(\ref{after_wolf})は二進数展開を行わずに連続変数で実験を行なった. Each variable moves by +0.001 or -0.001 with the same probability for each iteration. The 10,000 times execution results when $T(0)=1000$, $\alpha=0.9999$ and running algorithm until $T(n)<0.001$ are as shown in the Fig.\ref{fig:minimum1}.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{tabular}{c}
+      \begin{minipage}{0.50\hsize}
+        \centering
+        \includegraphics[keepaspectratio,scale=0.33]{minimum_cost.eps}
+      \end{minipage}
+      \begin{minipage}{0.50\hsize}
+        \centering
+        \includegraphics[keepaspectratio,scale=0.33]{minimum_t.eps}
+      \end{minipage} \\
+      \begin{minipage}{0.50\hsize}
+        \centering
+        \includegraphics[keepaspectratio,scale=0.33]{minimum_z1.eps}
+      \end{minipage}
+      \begin{minipage}{0.50\hsize}
+        \centering
+        \includegraphics[keepaspectratio,scale=0.33]{minimum_z2.eps}
+      \end{minipage}
+    \end{tabular}
+    \caption{The figures for upper left, upper right, lower left and lower right show the results when $F'(m), t, z_{1}, z_{2}$ are optimized for each $m$ respectively.}
+    \label{fig:minimum1}
+  \end{center}
+\end{figure}
 
 \section{Derivation of l1-norm in QUBO formulation} %l1-normのQUBOでの定式化
 We define the function $f(m)$ as follows:
-
-\begin{eqnarray}
-  \text{subject to} \quad -1\leq t\leq 1, z_{1}\geq 0, z_{2}\geq 0 \nonumber
-  \end{eqnarray}
-where M is a constant and take a large value to ensure the equality constraint ($-m-z_{1}+z_{2}=0$) to be satisfied, and the remaining inequality consraints conditions ($-1\leq t\leq 1, z_{1}\geq 0$ and $z_{2}\geq 0$) can be easily realized by expanding these variables $t,z_{1}$ and $z_{2}$, in the binary expressions which satisfy the corresponding domain constraints. We will varify in the next section that the (\ref{after_wolf}) is correctly fomulated. 
 
 \subsection{Results} \label{experiment_condition} %定式化したものを利用して実験を行う
 In this section, we verify that the formulation is correct by optimizing problem (\ref{after_wolf}) with SA Algorithm. \ref{alg:SA}. Each variable moves by +0.001 or -0.001 with the same probability for each iteration. The 10,000 times execution results when $T(0)=1000$, $\alpha=0.9999$ and running algorithm until $T(n)<0.001$ are as shown in the Fig.\ref{fig:minimum1}.
