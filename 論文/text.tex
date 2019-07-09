@@ -186,39 +186,10 @@ In this section, we verify that the formulation is correct by optimizing problem
   \end{center}
 \end{figure}
 
-\section{Derivation of l1-norm in QUBO formulation} %l1-normのQUBOでの定式化
-We define the function $f(m)$ as follows:
-
-\subsection{Results} \label{experiment_condition} %定式化したものを利用して実験を行う
-In this section, we verify that the formulation is correct by optimizing problem (\ref{after_wolf}) with SA Algorithm. \ref{alg:SA}. Each variable moves by +0.001 or -0.001 with the same probability for each iteration. The 10,000 times execution results when $T(0)=1000$, $\alpha=0.9999$ and running algorithm until $T(n)<0.001$ are as shown in the Fig.\ref{fig:minimum1}.
-
-\begin{figure}[htbp]
-  \begin{center}
-    \begin{tabular}{c}
-      \begin{minipage}{0.50\hsize}
-        \centering
-        \includegraphics[keepaspectratio,scale=0.33]{minimum_cost.eps}
-      \end{minipage}
-      \begin{minipage}{0.50\hsize}
-        \centering
-        \includegraphics[keepaspectratio,scale=0.33]{minimum_t.eps}
-      \end{minipage} \\
-      \begin{minipage}{0.50\hsize}
-        \centering
-        \includegraphics[keepaspectratio,scale=0.33]{minimum_z1.eps}
-      \end{minipage}
-      \begin{minipage}{0.50\hsize}
-        \centering
-        \includegraphics[keepaspectratio,scale=0.33]{minimum_z2.eps}
-      \end{minipage}
-    \end{tabular}
-    \caption{The figures for upper left, upper right, lower left and lower right show the results when $F'(m), t, z_{1}, z_{2}$ are optimized for each $m$ respectively.}
-    \label{fig:minimum1}
-  \end{center}
-\end{figure}
 From this result, we can confirm that l1-norm can be obtained by optimizing (\ref{after_wolf}). Also, if we look at each variable $t, z_{1}$ and $z_{2}$ at optimization, we can see the following: It may be possible to reduce one variable by reviewing the (\ref{after_wolf}) because $t$ is not converged alothough $z_{1}$ and $z_{2}$ converge to a specific value.
 
-\section{Reviewing formulation} %定式化の見直し
+\section{Reduced QUBO formulation} %定式化の見直し
+\subsection{Reduction of the variable in the Legendre transformation}
 We can think of the following from the results of the numerical experiments in the previous section: The variable $t$ seems to be taking a random value rather than settling to the optimal value, so we will consider whether we can eliminate $t$ by reviewing the formulation. 
 The cost function can be transformed as follows using equality constraint.
 \begin{alignat}{2}
@@ -231,7 +202,7 @@ The cost function can be transformed as follows using equality constraint.
 \end{alignat}
 This conversion from (\ref{after_wolf}) to (\ref{review_formulation}) is possible because the penalty term, $M(-m-z_{1}+z_{2})^{2}$, forces the equality constraint to be satisfied.
 
-\subsection{Results} %定式化したものを利用して実験を行う
+\subsection{Numerical validation} %定式化したものを利用して実験を行う
 The result of experimenting the optimization problem under the same experimental conditions as Section\ref{experiment_condition} with (\ref{review_formulation}) as the objective function is as shown in Fig.\ref{fig:minimum2}.
 \begin{figure}[htbp]
   \begin{center}
@@ -254,6 +225,7 @@ The result of experimenting the optimization problem under the same experimental
   \end{center}
 \end{figure}
 From this result, the outline of $F'(m), z_{1}$ and $z_{2}$ when optimizing (\ref{after_wolf}) did not change from Fig.\ref{fig:minimum2}, so we seem that removing the variable $t$ does not affect the result.
+
 
 \section{Comparetive experiment} %Lasso について比較実験を行う ここではアニーリングとpythonのskite-learnのLassoで比較実験を行う データはBosoton.csvを使用
 % アニーリングでのパラメータの設定についてとpythonの設定を記述する
