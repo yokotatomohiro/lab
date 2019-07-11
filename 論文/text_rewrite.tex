@@ -20,11 +20,12 @@
 \title{Derivaton of the QUBO formulation for sparse estimation}
 
 \author{Tomohiro Yokota$^1$%\thanks{jpsj{\_}edit@jps.or.jp}
-  , Jun Ohkubo$^1$, Makiko Konoshima$^2$, Hirotaka Tamura$^2$}
+  , Makiko Konoshima$^2$, Hirotaka Tamura$^2$, Jun Ohkubo$^3$}
 \inst{$^1$Graduate School of Science and Enginnering, Saitama University,
   255 Shimo-Okubo, Sakura-ku, Saitama-shi, 338-8570, Japan\\
-$^2$Fujitsu Laboratories Ltd.,
-4-1-1 Kawasaki, Kanagawa 211-8558, Japan} %\\
+  $^2$Fujitsu Laboratories Ltd.,
+  4-1-1 Kawasaki, Kanagawa 211-8558, Japan
+  $^3$JST, PREST, 4-1-8 Honcho, Kawaguchi, Saitama 332-0012, Japan} %\\
 
 \abst{%In recent years, annealing machine have been developed, and their use methods are considered in fields such as optimization problems and machine learning. In the annealing machine, it is necessary to express the problem to be dealt with in QUBO(Quadratic Unconstrained Binary Optimization) formulation and implement it as hardware. However, since the general method of rewriting to the QUBO format is not known yet, it needs to be derived individually. In this paper, we derive the QUBO formulation for the l1-norm (absolute value function) used in sparse estimation. As a result of experiment, it was possible to predict that one variable could be reduced from the result of numerical experiment by applying the Legendre transformation and Wolf-duality theorem to l1norm. By reviewing the formulation we were actually able to reduce one variable.
 
@@ -39,15 +40,15 @@ l1-normのQUBO形式での定式化を提案する. これにより, スパー�
 \maketitle
 
 \section{Introduction}
-近年では, D-Wave Systems Inc.のD-Waveや富士通のデジタルアニーラのようなイジング型マシンの開発が進められている. 利用できる量子ビット数が年々増加しており, これにより大きな組み合わせ最適化問題に対してイジング型マシンでの計算ができるようになった. しかし, イジング型マシンで最適化問題を計算するためには, コスト関数をQUBO形式に変換しハードウェアとして実装する必要があるが, その系統的な導出方法はまだ見つかっていない. 
+近年では, D-Wave Systems Inc.のD-Waveや富士通のデジタルアニーラのようなイジング型マシンの開発が進められている. 利用できる量子ビット数が年々増加しており, これにより大きな組み合わせ最適化問題に対してイジング型マシンでの計算ができるようになった. しかし, イジング型マシンで最適化問題を計算するためには, コスト関数をQUBO形式に変換しハードウェアとして実装する必要があるが, QUBO形式への系統的な導出方法はまだ見つかっていない. 
 
-先行研究ではq-loss関数とReLUタイプ関数のQUBO形式での導出がされている. q-loss関数の導出法についてはLegendre変換を適用することでQUBO形式を導出することができた. しかし, ReLUタイプ関数に対しては, Legendre変換だけを適用しただけではコスト関数のmin関数にマイナス符号がついてまう. これによりReLUタイプ関数を他のコスト関数を組み合わせて最適化問題を解くことが困難になる. そこで, Wolfeの双対定理を適用された. 
+先行研究ではq-loss関数とReLUタイプ関数のQUBO形式での導出がされている. q-loss関数の導出法についてはLegendre変換を適用することでQUBO形式を導出することができた. しかし, ReLUタイプ関数に対しては, Legendre変換だけを適用しただけではコスト関数のmin関数にマイナス符号がついてまう. これによりReLUタイプ関数を他のコスト関数を組み合わせて最適化問題を解くことが困難になる. そこで, Wolfeの双対定理を追加で適用することでこの問題を解決した. 
 
-本稿で紹介するl1-normはスパース推定を行う際に利用されている. スパース推定はデータ解析や画像処理の分野で利用されている. データ解析ではスパース推定を用いることで解がスパースになる. この考え方は, ブラックホールの解析でも利用されている. ブラックホールとても小さく, 今までの手法では解像度が低いため観測することが不可能であった. そこで, 世界中の電波望遠鏡から同時に測定を行い, その観測データに対してスパース推定を行うことで本質的な情報のみを取り出しブラックホールの画像化を行なった. したがって, スパース推定をイジング型マシンで行う上でこの研究は重要である.
+本稿で紹介するl1-normはスパース推定を行う際に利用されている. スパース推定はデータ解析や画像処理の分野で利用されている. データ解析で利用されるもので代表的なものにLassoがあり, 最小二乗法のコスト関数にl1-normを加えることでスパースな推定を行うことを可能にしている. スパース推定の考え方は, ブラックホールの解析でも利用されている. ブラックホールとても小さく, 今までの手法では解像度が低いため観測することが不可能であった. そこで, 世界中の電波望遠鏡から同時に測定を行い, その観測データに対してスパース推定を行うことで本質的な情報のみを取り出しブラックホールの画像化を行なった. このように, スパース推定をイジング型マシンで行う上でこの研究は重要である.
 
 本稿ではl1-normのQUBO形式での定式化を行う. そのために, Legendre変換およびWolfeの双対定理を用いる. さらに, 定式化を見直すことで, 単純に適用した場合よりも変数を減らせることが確認できた. これはイジング型マシンの量子ビット数に制限がある現在において, ハードウェアへの実装を考える上で重要なことである. 
 
-構成について
+本稿の構成は次のようになる. 第二章では, QUBO形式, 先行研究, 導出に利用する定理についての説明を行う. 第三章では, l1-normのQUBO形式での導出およびその検証を行う. 第四章では, 
 
 \section{Background}
 In this section, we describes the knowledge.
@@ -164,7 +165,22 @@ In order to remove the equality constraint ($-m-z_{1}+z_{2}=0$), it is enough to
 where M is a constant and take a large value to ensure the equality constraint ($-m-z_{1}+z_{2}=0$) to be satisfied, and the remaining inequality consraints conditions ($-1\leq t\leq 1, z_{1}\geq 0$ and $z_{2}\geq 0$) can be easily realized by expanding these variables $t,z_{1}$ and $z_{2}$, in the binary expressions which satisfy the corresponding domain constraints. We will varify in the next section that the (\ref{after_wolf}) is correctly fomulated. 
 
 \subsection{Numerical validation}
-In this section, we verify that the formulation is correct by optimizing problem (\ref{after_wolf}) with SA Algorithm. 今回の数値実験の目的は導出された定式化の確認なので式(\ref{after_wolf})は二進数展開を行わずに連続変数で実験を行なった. Each variable moves by +0.001 or -0.001 with the same probability for each iteration. The 10,000 times execution results when $T(0)=1000$, $\alpha=0.9999$ and running algorithm until $T(n)<0.001$ are as shown in the Fig.\ref{fig:minimum1}.
+In this section, we verify that the formulation is correct by optimizing problem (\ref{after_wolf}) with SA Algorithm. 今回の数値実験の目的は導出された定式化の確認なので式(\ref{after_wolf})は二進数展開を行わずに連続変数で実験を行なった. 定数および変数の初期値について以下に記述する.
+\begin{itemize}
+\item constant $m$ : Generate uniform random number in the range of $[-10,10]$.
+\item variables $t, z_{1}, z_{2}$ : 
+  \begin{itemize}
+  \item $t$ generates uniform random number in the range of $[-1,1]$.
+  \item $z_{1}$ and $z_{2}$ generate uniform random number in the range of $[0,10]$.
+  \end{itemize}
+\end{itemize}
+Each variable moves by +0.001 or -0.001 with the same probability for each iteration. アニーリングの条件については以下に記述する.
+\begin{itemize}
+\item initial temperature is $T_{1}=1,000$.
+\item the number of iteration is until temperature is up to a temperature of $1\times 10^{-3}$.
+\item annealing schedule is $T_{n+1}=0.9999T_{n}$
+\end{itemize}
+ Result is Fig.\ref{fig:minimum1}.
 
 \begin{figure}[htbp]
   \begin{center}
@@ -233,29 +249,6 @@ From this result, the outline of $\widetilde{F}(m), z_{1}$ and $z_{2}$ when opti
 
 \section{conclsion}
 
-
-\section{Comparetive experiment} %Lasso について比較実験を行う ここではアニーリングとpythonのskite-learnのLassoで比較実験を行う データはBosoton.csvを使用
-% アニーリングでのパラメータの設定についてとpythonの設定を記述する
-
-\subsection{Results}
-\begin{table}
-  \begin{tabular}{|c||r|r|} \hline
-    elements  & Coordinate Descent & Annealing \\ \hline
-    "crim"    & -0.00000000 & -0.015 \\
-    "zn"      &  0.00000000 &  0.000 \\
-    "indus"   & -0.00000000 & -0.002 \\
-    "chas"    &  0.00000000 &  0.014 \\
-    "nox"     & -0.00000000 & -0.002 \\
-    "rm"      &  2.71542789 &  2.829 \\
-    "age"     & -0.00000000 &  0.000 \\
-    "dis"     & -0.00000000 & -0.000 \\
-    "rad"     & -0.00000000 & -0.000 \\
-    "tax"     & -0.00000000 & -0.013 \\
-    "ptratio" & -1.34428304 & -1.305 \\
-    "black"   &  0.18036988 &  0.234 \\
-    "lstat"   & -3.54677609 & -3.456 \\ \hline
-  \end{tabular}
-\end{table}
 
 \begin{acknowledgment}
 
