@@ -27,9 +27,8 @@
   4-1-1 Kawasaki, Kanagawa 211-8558, Japan
   $^3$JST, PREST, 4-1-8 Honcho, Kawaguchi, Saitama 332-0012, Japan} %\\
 
-\abst{%In recent years, annealing machine have been developed, and their use methods are considered in fields such as optimization problems and machine learning. In the annealing machine, it is necessary to express the problem to be dealt with in QUBO(Quadratic Unconstrained Binary Optimization) formulation and implement it as hardware. However, since the general method of rewriting to the QUBO format is not known yet, it needs to be derived individually. In this paper, we derive the QUBO formulation for the l1-norm (absolute value function) used in sparse estimation. As a result of experiment, it was possible to predict that one variable could be reduced from the result of numerical experiment by applying the Legendre transformation and Wolf-duality theorem to l1norm. By reviewing the formulation we were actually able to reduce one variable.
-
-l1-normのQUBO形式での定式化を提案する. これにより, スパース推定に対するQUBO形式を導出することができるようになる. Sato et al.(2019)が提案したReLUタイプ関数の定式化の方法を応用することで, l1-normのQUBO形式での導出を行なった. 加えて, 数値実験を通して, 定式を見直すことにより変数を減らすことができた. 
+\abst{%l1-normのQUBO形式での定式化を提案する. これにより, スパース推定に対するQUBO形式を導出することができるようになる. Sato et al.(2019)が提案したReLUタイプ関数の定式化の方法を応用することで, l1-normのQUBO形式での導出を行なった. 加えて, 数値実験を通して, 定式を見直すことにより変数を減らすことができた.
+  We propose the $\ell_{1}$-norm in QUBO formulation, which makes it possible to derive the QUBO formulation for sparse estimation. I derived the $\ell_{1}$-norm in the QUBO formulation by applying the method of formulation of ReLU type function proposed by Sato et al. (2019). In addition, through numerical experiments, I was able to reduce the variables by reviewing the fomulation.
 }
 
 %%% Keywords are not needed any longer. %%%
@@ -40,15 +39,56 @@ l1-normのQUBO形式での定式化を提案する. これにより, スパー�
 \maketitle
 
 \section{Introduction}
-近年では, D-Wave Systems Inc.のD-Waveや富士通のデジタルアニーラのようなイジング型マシンの開発が進められている. 利用できる量子ビット数が年々増加しており, これにより大きな組み合わせ最適化問題に対してイジング型マシンでの計算ができるようになった. しかし, イジング型マシンで最適化問題を計算するためには, コスト関数をQUBO形式に変換しハードウェアとして実装する必要があるが, QUBO形式への系統的な導出方法はまだ見つかっていない. 
+%近年では, D-Wave Systems Inc.のD-Waveや富士通のデジタルアニーラのようなイジング型マシンの開発が進められている.
+In recent years, Ising machines such as D-Wave Inc.'s D-Wave and Fujitsu's Digital Annear have been developed.
+%利用できる量子ビット数が年々増加しており, これにより大きな組み合わせ最適化問題に対してイジング型マシンでの計算ができるようになった.
+The number of available qubits has been increasing year by year, which has enabled Ising machine calculations for large combinatorial optimization problems.
+%しかし, イジング型マシンで最適化問題を計算するためには, コスト関数をQUBO形式に変換しハードウェアとして実装する必要があるが, QUBO形式への系統的な導出方法はまだ見つかっていない.
+However, to calculate the optimization problem with Ising machine, it is necessary to convert the cost function into QUBO form and impliment as hardware, but a systematic derivation method to QUBO form has not been found yet.
 
-先行研究ではq-loss関数とReLUタイプ関数のQUBO形式での導出がされている. q-loss関数の導出法についてはLegendre変換を適用することでQUBO形式を導出することができた. しかし, ReLUタイプ関数に対しては, Legendre変換だけを適用しただけではコスト関数のmin関数にマイナス符号がついてまう. これによりReLUタイプ関数を他のコスト関数を組み合わせて最適化問題を解くことが困難になる. そこで, Wolfeの双対定理を追加で適用することでこの問題を解決した. 
+%先行研究ではq-loss関数とReLUタイプ関数のQUBO形式での導出がされている.
+In previous research, $q$-loss function and ReLU type function have been derived in the QUBO form.
+%q-loss関数の導出法についてはLegendre変換を適用することでQUBO形式を導出することができた.
+As for the derivation method of $q$-loss function, QUBO form could be derived by applying Legendre transformation.
+%しかし, ReLUタイプ関数に対しては, Legendre変換だけを適用しただけではコスト関数のmin関数にマイナス符号が付いてしまい複数のコスト関数を組み合わせて最適化問題を解くことができない.
+However, for the ReLU type function, the $\min$ function of the cost function has a minus sign only by applying the Legendre transform, and it is impossible to solve the optimization problem by combining multiple cost functions.
+%そこで, Wolfeの双対定理を追加で適用することでこの問題を解決した.
+Therefore, this problem was solved by additionally applying Wolfe duality theorem.
 
-本稿で紹介するl1-normはスパース推定を行う際に利用されている. スパース推定はデータ解析や画像処理の分野で利用されている. データ解析で利用されるもので代表的なものにLassoがあり, 最小二乗法のコスト関数にl1-normを加えることでスパースな推定を行うことを可能にしている. スパース推定の考え方は, ブラックホールの解析でも利用されている. ブラックホールとても小さく, 今までの手法では解像度が低いため観測することが不可能であった. そこで, 世界中の電波望遠鏡から同時に測定を行い, その観測データに対してスパース推定を行うことで本質的な情報のみを取り出しブラックホールの画像化を行なった. このように, スパース推定をイジング型マシンで行う上でこの研究は重要である.
+%本稿で紹介するl1-normはスパース推定を行う際に利用されている.
+The $\ell_{1}$-norm introduced in this paper is used in sparse estimation.
+%スパース推定はデータ解析や画像処理の分野で利用されている.
+Sparse estimation is used in the field of data analysis and image processing.
+%データ解析で利用されるもので代表的なものにLassoがあり, 最小二乗法のコスト関数にl1-normを加えることでスパースな推定を行うことを可能にしている.
+Lasso is a typical example used in data analysis, and it is possible to perform sparse estimation by adding $\ell_{1}$-norm to the least-squares cost function.
+%スパース推定の考え方は, ブラックホールの解析でも利用されている.
+The idea of sparse estimation is used in black hole analysis.
+%ブラックホールとても小さく, 今までの手法では解像度が低いため観測することが不可能であった.
+The black hole is so small that it is impossible to observe it by the previous method because the resolution is low.
+%そこで, 世界中の電波望遠鏡から同時に測定を行い, その観測データに対してスパース推定を行うことで本質的な情報のみを取り出しブラックホールの画像化を行なった.
+Therefore, we performed simultaneous measurements from radio telescopes all over the world, performed sparse estimation on the observation data, extracted only essential information, and performed imaging of black holes.
+%このように, スパース推定をイジング型マシンで行う上でこの研究は重要である.
+Thus, this research is important in performing sparse estimation on Ising machines.
 
-本稿ではl1-normのQUBO形式での定式化を行う. そのために, Legendre変換およびWolfeの双対定理を用いる. さらに, 定式化を見直すことで, 単純に適用した場合よりも変数を減らせることが確認できた. これはイジング型マシンの量子ビット数に制限がある現在において, ハードウェアへの実装を考える上で重要なことである. 
+%本稿ではl1-normのQUBO形式での定式化を行う.
+In this paper, we derivate $\ell_{1}$-norm in QUBO formlation.
+%そのために, Legendre変換およびWolfeの双対定理を用いる.
+To do this, we use the Legendre transform and Wolfe duality theorem.
+%さらに, 定式化を見直すことで, 単純に適用した場合よりも変数を減らせることが確認できた.
+Furthermore, it was confirmed that the variables can be reduced by reviewing the formulation, compared to the case of simple application.
+%これはイジング型マシンの量子ビット数に制限がある現在において, ハードウェアへの実装を考える上で重要なことである.
+This is important when considering hardware implementation in the current situation where the number of qubits of Ising machine is limited.
 
-本稿の構成は次のようになる. 第二章では, QUBO形式, 先行研究, 導出に利用する定理についての説明を行う. 第三章では, l1-normのQUBO形式での導出およびその検証を行う. 第四章では, 
+%本稿の構成は次のようになる.
+The composition of  this paper is as follows.
+%第二章では, QUBO形式, 先行研究, 導出に利用する定理についての説明を行う.
+Chapter 2 explains the QUBO form, previous researchs, and theorems used for derivation.
+%第三章では, l1-normのQUBO形式での導出およびその検証を行う.
+Chapter 3 carried out the derivation of $\ell_{1}$-norm in the QUBO form and its varification.
+%第四章では, 定式化を見直すことで目的関数から変数を削除し, 結果に影響がないかを検証する.
+Chapter 4 removes variables from the objective function, and varifies whether the result is not affected.
+%第五章では第四章での結果およびこれからの展望について語る.
+Chapter 5 discusses the results of Chaption 4 and the prospects for the future.
 
 \section{Background}
 In this section, we describes the knowledge.
@@ -64,38 +104,37 @@ where $\sigma_{i}\in \{-1,+1\}$is a spin variable for $i$-th spin, $J_{ij}\in \m
 \end{eqnarray}
 
 \subsection{previous research}
-この節では先行研究で行われたq-loss関数とReLUタイプ関数のQUBO形式について記載する.
-
-q-loss関数のコスト関数は次のように表される.
+%この節では先行研究で行われたq-loss関数とReLUタイプ関数のQUBO形式について記載する.
+This section describes the QUBO formulation of the $q$-loss function and ReLU type function performed in the previous research.
+The cost function of the $q$-loss function can be represented as 
 \begin{eqnarray}
   L_{q}(m)=\min{[(1-q)^{2}, (\max{[0,1-m]})^{2}]} \label{q-loss_function}
 \end{eqnarray}
-ここで, $q\in (\infty,0]$はパラメータであり, $m$は実変数である. 式(\ref{q-loss_function})に対してLegendre変換を適用することで次のように変換できる.
+where, $q\in (\infty,0]$ is a parameter and $m$ is a variable. By applying the Legendre transform to Eq. (\ref{q-loss_function}) we can transform it as follow.
 \begin{eqnarray}
   L_{q}(m)=\min_{t}{\left\{(m-t)^{2}+(1-q)^{2}\frac{(1-\text{sign}(t-1))}{2}\right\}} \label{q-loss_function_legendre}
 \end{eqnarray}
 
-ReLUタイプ関数のコスト関数は次のように表される.
+The cost function of the ReLU type function can be represented as follow.
 \begin{eqnarray}
   f(m)=-\min{(0,m)} \label{ReLU_function}
 \end{eqnarray}
-式(\ref{ReLU_function})に対してLegendre変換を適用することで次のように変換できる.
+By applying the Legendre transform to Eq. (\ref{ReLU_function}), you can transform it as follow.
 \begin{eqnarray}
   f(m)=-\min_{t}{\{-mt\}} \quad \text{subject to} \quad -1\leq t\leq 0 \label{ReLU_function_legendre}
 \end{eqnarray}
-ここで, 式(\ref{ReLU_function_legendre})の$\min$関数にマイナス符号が付いているため, 複数のコスト関数と組み合わせた最適化問題を解くこと困難である. そこで, 式(\ref{ReLU_function_lengendre})に対して, Wolfeの双対定理を適用する. wolfeの双対定理の詳細については次の節で説明を行う.
+Here, since the $\min$ function of Eq.(\ref{ReLU_function_legendre}) has a minus sign, it is difficult to solve an optimization problem that is combined with multiple cost functions. So, this apply Wolfe duality theorem to Eq.(\ref{ReLU_function_legendre}). The details of Wolfe duality theorem are explained in the next section.
 \begin{eqnarray}
   f(m)=\min_{t,z_{1},z_{2}}{\{mt+z_{1}(t+1)-z_{2}t-M(-m-z_{1}+z_{2})^{2}\}} \label{ReLU_function_wolfe}
 \end{eqnarray}
-ここで, $M$は大きな正の定数である.
-式(\ref{q-loss_function_legendre}),(\ref{ReLU_function_wolfe})について, 二進数展開をすることでQUBO形式を導出することができる.
+where M is a large positive constant. We can derive the QUBO formulation by binary expansion of Eq.(\ref{q-loss_function_legendre}) and (\ref{ReLU_function_wolfe}).
 
 \subsection{Wolfe-duality} \label{sec:wolfe}
-Wolfeの双対定理は不等式制約を持つ最大化問題となる双対問題を導出することができる. 次のような制約を持つ最適化問題を考える.
+Wolfe duality theorem can derive the dual problem which is the maximization problem from an optimization problem with inequality constraints. Consider an optimization problem with the following constraints.
 \begin{equation}
   \left\{
   \begin{aligned}
-    & \text{minimize}_{x}  \quad  f_{W}(x) \quad (x\in\mathbb{R}^{n}),\\
+    & \text{minimize}_{x}  \quad  f_{W}(x) \quad \quad \ (x\in\mathbb{R}^{n}),\\
     & \text{subject to}  \ \quad h_{i}(x)\leq 0 \quad (i=1,2,\dots,l). \label{object_function}
   \end{aligned}
   \right.
@@ -108,16 +147,15 @@ Wolfeの双対定理は不等式制約を持つ最大化問題となる双対問
 \begin{equation}
   \left\{
   \begin{aligned}
-    & \text{maximize}_{x,z}  \quad L(x,z) \quad ((x,z)\in \mathbb{R}^{n}\times\mathbb{R}^{l}),\\
-    & \text{subject to}  \qquad \nabla L(x,z)=0 \ (z \geq 0).
+    & \text{maximize}_{x,z}  \quad L(x,z) \quad \quad \quad \ ((x,z)\in \mathbb{R}^{n}\times\mathbb{R}^{l}),\\
+    & \text{subject to}  \qquad \nabla L(x,z)=0 \quad (z \geq 0).
   \end{aligned}
   \right.
 \end{equation}
 上記に示すように, Wolfeの双対定理は最適化問題を最大化問題に変換する. 
 
-\section{Naive derivation of QUBO formulation for $\ell{l}_{1}$-norm}
+\section{Naive derivation of QUBO formulation for $\ell{l}_{1}$-norm} \label{Native_derivation}
 この章では絶対値関数のQUBO形式での定式化を行う.
-\ref{sec:wolfe}章で説明したWolfeの双対定理を式(\ref{})
 \subsection{QUBO formulation}
 絶対値関数$f(m)$は次のように定義される.
 \begin{eqnarray}
@@ -224,7 +262,8 @@ The cost function can be transformed as follows using equality constraint.
 This conversion from (\ref{after_wolf}) to (\ref{review_formulation}) is possible because the penalty term, $M(-m-z_{1}+z_{2})^{2}$, forces the equality constraint to be satisfied.
 
 \subsection{Numerical validation} %定式化したものを利用して実験を行う
-The result of experimenting the optimization problem under the same experimental conditions as Section\ref{experiment_condition} with (\ref{review_formulation}) as the objective function is as shown in Fig.\ref{fig:minimum2}.
+The result of experimenting the optimization problem under the same experimental conditions as Section\ref{Native_derivation} with (\ref{review_formulation}) as the objective function is as shown in Fig.\ref{fig:minimum2}.
+
 \begin{figure}[htbp]
   \begin{center}
     \begin{tabular}{c}
@@ -245,9 +284,10 @@ The result of experimenting the optimization problem under the same experimental
     \label{fig:minimum2}
   \end{center}
 \end{figure}
-From this result, the outline of $\widetilde{F}(m), z_{1}$ and $z_{2}$ when optimizing (\ref{after_wolf}) did not change from Fig.\ref{fig:minimum1}, so we seem that removing the variable $t$ does not affect the result.
+From this result, the outline of $\widetilde{F}(m), z_{1}$ and $z_{2}$ when optimizing (\ref{after_wolf}) did not change from Fig.\ref{fig:minimum2}, so we seem that removing the variable $t$ does not affect the result.
 
-\section{Conclsion}
+
+\section{conclsion}
 本稿では, $\ell{l}_{1}$-normのQUBO形式での定式化を提案し, 定式化を見直すことで変数の数を減らせること確認した.
 
 
