@@ -38,3 +38,10 @@ FIRディジタルフィルタは振幅特性次のように表される.
 http://www.ieice.org/tokyo/gakusei/activity/kenkyuu-happyoukai/happyou-ronbun/16/pdf/22.pdf
 
 
+https://www.frontiersin.org/articles/10.3389/fphy.2014.00005/full
+
+https://journals.aps.org/pre/pdf/10.1103/PhysRevE.83.046709
+
+https://arxiv.org/pdf/1709.07511.pdf
+
+https://arxiv.org/pdf/1812.05269.pdf
