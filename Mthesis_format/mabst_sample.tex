@@ -48,14 +48,23 @@ QUBO$B7A<0$O(B$q_{i}\in\{ 0,1\}$$B$N%P%$%J%jJQ?t$r$H$k(B. $B$^$?(B, $B%$%
   H=-\sum_{i,j}{\widetilde{J}_{i,j}q_{i}q_{j}}-\sum_{i}{\widetilde{h}_{i} q_{i}}
 \end{eqnarray}
 \subsection{$q$-loss$B4X?t(B}
-Denchev$B$i$,9T$C$?@h9T8&5f$K$D$$$F@bL@$9$k(B. \ref{}$B$GDs0F$5$l$?(B$q$-loss$B4X?t$O<!$N$h$&$KI=$5$l$k(B
-
+QUBO$B7A<0$X$NDj<02=$r9T$&@h9T8&5f$K$D$$$F@bL@$9$k(B. \ref{}$B$GDs0F$5$l$?(B$q$-loss$B4X?t$O<!$N$h$&$KI=$5$l(B, $B357A$O?^(B\ref{fig:q-loss}$B$N$h$&$K$J$k(B.
+\begin{eqnarray}
+  L_{q}(m)=\min{[(1-q)^{2}, (\max{[0,1-m]})^{2}]} \label{eq:q-loss_before}
+\end{eqnarray}
+$B$3$3$G(B, $q$$B$O(B$(\infty,0]$$B$N%Q%i%a!<%?$G$"$j(B, $m$$B$OO"B3JQ?t$G$"$k(B. $BO@J8$G$O(B, $q$-loss$B4X?t$rMQ$$$?J,N`LdBj$r9T$&$3$H$G(B, $B%i%Y%k%N%$%:$KBP$7$F(B$q$-loss$B4X?t$O!V%m%P%9%H@-!W$r;}$D$3$H$,3NG'$G$-$?(B. $B$7$+$7(B, $B$3$N(B$q$-loss$B4X?t$O(B$\max$$B4X?t$r4^$s$G$$$k$?$a(BQUBO$B7A<0$X$N<BAu$,MF0W$G$O$J$+$C$?(B. $B$=$3$G(BDenchev$BEy$O(BLegendre$BJQ49$rE,MQ$9$k$3$H$G<0(B(\ref{eq:q-loss_before})$B$r<0(B(\ref{eq:q-loss})$B$X$HJQ49$7$?(B.
+\begin{eqnarray}
+  L_{q}(m)=\min_{t}{\left\{ (m-t)^{2}+(1-q)^{2}\frac{2}{(1-sign(t-1))}\right\} } \label{eq:q-loss}
+\end{eqnarray}
+$B$3$3$G(B$t$$B$O(BLegendre$BJQ49$r9T$&2aDx$GDI2C$7$?JQ?t$G$"$k(B. sign$B4X?t$OFs?J?tE83+$r$9$k$H0lBN$GI=8=$9$k$3$H$,2DG=$G$"$j(B, $BO"B3JQ?t(B$m$$B$H(B$t$$B$K$D$$$F$bF1MM$KFs?J?tE83+$r9T$&$3$H$G(B, $B<0(B(\ref{eq:q-loss})$B$r(BQUBO$B7A<0$KJQ49$9$k$3$H$,2DG=$G$"$k(B. $BO"B3JQ?t$NFs?J?tE83+$N>\:Y$K$D$$$F$O(B
+  
 \subsection{ReLU$B%?%$%W4X?t(B}
 
 \section{$L_{1}$$B%N%k%`$N(BQUBO$B7A<0(B}
 
 \section{$B4XO"8&5f(B}
 \subsection{Non-Stoquastic$B%O%_%k%H%K%"%s(B}
+
 
 %pLaTeX 2e $BMQ$N%9%?%$%k%U%!%$%k$G$9!#(B
 %mabst.sty
