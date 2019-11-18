@@ -1,99 +1,181 @@
 \documentclass{jarticle}
 \usepackage{mabst}
+\usepackage[dvips]{graphicx}
+\usepackage{bm}
 
 \title{
-Digital Annealer$B$rMQ$$$?%9%Q!<%9?dDj(B
+Digital Annealerを用いたスパース推定
 }
 
 \newcommand{\ID}{19MM336}
-\newcommand{\Name}{$B;a(B $BL>!!2#ED!!CNBg(B}
-\newcommand{\Teacher}{$BBg5WJ]!!=a!!=Z65<x(B}
+\newcommand{\Name}{氏 名　横田　知大}
+\newcommand{\Teacher}{大久保　潤}
 
-%\setlength{\oddsidemargin}{-2mm}  % $B%W%j%s%?!<$K9g$o$;$FD4@0$7$F2<$5$$(B
+%\setlength{\oddsidemargin}{-2mm}  % プリンターに合わせて調整して下さい
 
 \begin{document}
 \maketitle
 
-\section{$BF3F~(B}
-$B6aG/$G$O(B, $B?7$?$J%O!<%I%&%'%"$N3+H/$HDs6!$,9T$o$l$F$*$j(B, $B%+%J%@$N(BD-Wave.inc$B$,Ds6!$9$k%$%8%s%07?%"%K!<%j%s%0%^%7%s$N(BD-Wave 2000$B$dIY;NDL$N8EE5E*$JO@M}2sO)$r4p$K$9$k%"%K!<%j%s%0%"%/%;%i%l!<%?$rMQ$$$?(BDigital Annealer$B$,$"$k(B. $B$3$l$i$N%"%K!<%j%s%0%^%7%s$O:GE,2=LdBj$N6a;w2r$rF@$k$?$a$KMQ$$$i$l$k(B.
+\section{導入}
+近年では, 新たなハードウェアの開発と提供が行われており, カナダのD-Wave.incが提供するイジング型アニーリングマシンのD-Wave 2000\cite{d-wave01, d-wave02}や富士通の古典的な論理回路を基にするアニーリングアクセラレータを用いたDigital Annealerがある. これらのアニーリングマシンは最適化問題の近似解を得るために用いられる.
 
-$B>e5-$N%"%K!<%j%s%0%^%7%s$O%$%8%s%0%?%$%W$N%O%_%k%H%K%"%s$r4p$K$7$F$$$k$?$a(B, $B2r$-$?$$:GE,2=LdBj$N%3%9%H4X?t$r(BQUBO$B7A<0$KJQ49$9$kI,MW$,$"$k(B. $B$3$3$G(B, $BO"B3JQ?t$OFs?J?tE83+$r9T$&$3$H$G%$%8%s%07?$NJQ?t$KJQ49$9$k$3$H$,$G$-$k$,(B, $B85$N%3%9%H4X?t$NDjNLE*$J(BQUBO$B7A<0$NF3=PJ}K!$O$^$@8+$D$+$C$F$$$J$$(B. $B$7$+$7$J$,$i(B, $B$$$/$D$+$N:FDj<02=$O(BLucas$B$N@h9T8&5f$K$h$C$FM?$($l$F$*$j(B, QUBO$B7A<0$GI=8=$9$kO@M}%2!<%H$r<($7$F$$$k(B. $B$^$?(B, $B6aG/$G$O%k%8%c%s%I%kJQ49$rMQ$$$?(B$q$-loss$B4X?t$N(BQUBO$B7A<0$NF3=P$,$5$l$F$$$k(B.
+上記のアニーリングマシンはイジングタイプのハミルトニアンを基にしているため, 解きたい最適化問題のコスト関数をQUBO形式に変換する必要がある. ここで, 連続変数は二進数展開を行うことでイジング型の変数に変換することができるが, 元のコスト関数の定量的なQUBO形式の導出方法はまだ見つかっていない. しかしながら, いくつかの再定式化はLucasの先行研究によって与えられている\cite{NP_problem}. また, 近年ではルジャンドル変換を用いた$q$-loss関数のQUBO形式の導出\cite{bib:q-loss}がされている.
 
-$q$-loss$B4X?t$O5!3#3X=,$N%i%Y%k%N%$%:$KBP$7$F%m%P%9%H@-$r;}$D%3%9%H4X?t$rDs6!$7(B, $B%k%8%c%s%I%kJQ49$rMQ$$$?(BQUBO$B7A<0$X$NJQ49$O$$$/$D$+$N?t3XE*$JJQ49$K4X78$7$F$$$k(B. $B<B:]$K(B, ReLU$B%?%$%W4X?t$KBP$7$F$O%k%8%c%s%I%kJQ49$@$1$G$OIT==J,$G$"$j(B, Wolfe$B$NAPBPDjM}$rDI2C$GMQ$$$i$l$?(B. $B$3$N7k2L$+$i(BQUBO$B7A<0$rD>@\E*$KF3=P$9$k$3$H$O:$Fq$G$"$j(B, $B$H$-$K$O85$N%3%9%H4X?t$K0MB8$7$?$5$i$J$kJQ49$r9T$&I,MW$,$"$k(B.
+このように, アニーリングマシンを機械学習で用いるためにQUBO形式を導出する研究がある. この他にも最適化問題に関連のある研究分野は数多くあり, その１つにデータ解析がある. データ解析において正規化の概念は重要であり, 機械学習でも用いられる. なかでも$\ell_{1}$ノルムは解にスパース性を加えるために用いられ, 特にLASSOはスパース推定を行う有用な方法であり近年ではブラックホールの画像を生成するためにも用いられている\cite{black_hole}.
 
-$B$3$N$h$&$K(B, $B%"%K!<%j%s%0%^%7%s$r5!3#3X=,$GMQ$$$k$?$a$K(BQUBO$B7A<0$rF3=P$9$k8&5f$,$"$k(B. $B$3$NB>$K$b:GE,2=LdBj$K4XO"$N$"$k8&5fJ,Ln$O?tB?$/$"$j(B, $B$=$N#1$D$K%G!<%?2r@O$,$"$k(B. $B%G!<%?2r@O$K$*$$$F!V@55,2=!W$N35G0$O=EMW$JLr3d$r;}$A(B, $B5!3#3X=,$G$bMQ$$$i$l$k(B. $BNc$($P(B$L_{2}$$B%N%k%`$O<BMQE*$JLdBj$KBP$7$FI}9-$/MxMQ$5$l$F$*$j(B, $B$^$?(B, $L_{1}$$B%N%k%`$O2r$K!V%9%Q!<%9@-!W$r2C$($k$?$a$KE,MQ$5$l$k(B. $BFC$K(BLASSO$B$O%9%Q!<%9?dDj$r9T$&$?$a$NM-L>$JJ}K!$G$"$j(B, $B%3%9%H4X?t$K(B$L_{1}$$B%N%k%`$r2C$($k$@$1$GNI$$$N$G<BAu$,MF0W$G$"$k(B. $B6aG/$G$O(B, $B%9%Q!<%9?dDj$N9M$(J}$O%V%i%C%/%[!<%k$NJ,@O$KMxMQ$5$F$$$k(B. $B%V%i%C%/%[!<%k$K4X$9$k%G!<%?$O$H$F$b>.$5$/$?$a2hA|$N2rA|EY$,Dc$/(B, $B4QB,$9$k$3$H$,:$Fq$G$"$k(B. $B$=$N$?$a(B, $B@$3&Cf$NEEGHK>1s6@$+$iF1;~$K4QB,$r9T$$(B, $B4QB,$5$l$?%S%C%0%G!<%?$KBP$7$F%9%Q!<%9?dDj$K4p$E$/J}K!$rE,MQ$9$k$3$H$GI,MW$J>pJs$N$_$rCj=P$7%V%i%C%/%[!<%k$N2hA|$,F@$i$l$?(B.
+また, イジングマシンへの問題の実装の他にも量子力学に従うように見えるが, 実際には古典の確率的なアルゴリズムでも動作可能な''stoquastic''ではなく確率的なアルゴリズムでは動作できない''non-stoquastic''なシステムを量子コンピュータで効率よく計算するための手法も提案されている.
 
-$B%"%K!<%j%s%0%^%7%s$rMQ$$$?@55,2=$N<BAu$K4X$7$F(B, $L_{2}$$B%N%k%`$OFs<!7A<0$J$N$G(BQUBO$B7A<0$X$NJQ49$OMF0W$G$"$k$,(B, $L_{1}$$B%N%k%`$OHyJ,IT2DG=$J$?$a(BQUBO$B7A<0$X$NJQ49$O:$Fq$G$"$C$?(B.
-
-$B0JA0$N8&5f$G$O(B, $L_{1}$$B%N%k%`$N(BQUBO$B7A<0$X$NDj<02=$r9T$$(B, $BFs?J?tE83+$^$G$O9T$o$:O"B3JQ?t$rMQ$$$F(B, $B%7%_%e%l!<%F%C%I%"%K!<%j%s%0$K$h$k?tCM<B83$r$9$k$3$H$G8!>Z$r9T$C$?(B. $B$=$N7k2L$+$iJQ?t$N:o8:$r9T$&$3$H$,$G$-$?(B.
-
-$BK\8&5f$G$O(B, $B0JA0$N8&5f$G$O9T$($J$+$C$?(B, $BFs?J?tE83+$rE,MQ$7$?N%;6CM$KBP$7$F$N8EE5%^%7%s$H(BDigital Annealer$B$rMQ$$$??tCM<B837k2L$NHf3S$r9T$&(B. $B$^$?(B, $BK\9F$G$ONL;R%"%K!<%i$K4XO"$9$k8&5fF08~$K$D$$$F$b5-:\$9$k(B.
-
-$B0J9_$N>O$G$O(B, $BNL;R%"%K!<%i$K4XO"$9$k8&5fF08~$*$h$SK\8&5f$GMQ$$$k<jK!$N>\:Y$K$D$$$F@bL@$9$k(B.
-$B;0>O$G$O(B, QUBO$B7A<0$H%$%8%s%0%b%G%k$K$D$$$F$H@h9T8&5f$G9T$o$l$?$$$/$D$+LdBj$r(BQUBO$B7A<0$XJQ49$9$k<jK!$K$D$$$F5-:\$9$k(B.
-$B;M>O$G$O(B, $BK\8&5f$NO"B3JQ?t$KBP$7$FFs?J?tE83+$9$k$3$H$GN%;6CM$KJQ49$9$k<jK!$K$D$$$F$N@bL@$H8EE5$H%G%8%?%k%"%K!<%j%s%0%^%7%s$GMQ$$$k%O%_%k%H%K%"%s$N7A<0$K$D$$$F$N@bL@$r9T$&(B.
-$B8^>O$G$O(B, $B;M>O$G>R2p$7$?$b$N$H$O0[$J$k%O%_%k%H%K%"%s$K$D$$$F$N@bL@$r9T$$(B, $BNL;R%"%K!<%j%s%0%O!<%I%&%'%"$X$N<BAu$K$D$$$F9M$($k(B.
-
-\section{$BGX7J$H@h9T8&5f(B}
-\subsection{QUBO$B7A<0$H%$%8%s%0%b%G%k(B}
-$B%G%8%?%k%"%K!<%i$GAH$_9g$o$;:GE,2=LdBj$r2r$/$?$a$K$OLdBj$r%$%8%s%07A<0$b$7$/$O(BQUBO$B7A<0$GI=8=$9$kI,MW$,$"$k(B.
-QUBO$B7A<0$O(B$q_{i}\in\{ 0,1\}$$B$N%P%$%J%jJQ?t$r$H$k(B. $B$^$?(B, $B%$%8%s%0%b%G%k$O(B$\sigma_{i}\in\{ -1,+1\}$$B$N%P%$%J%jJQ?t$r$H$j(B, QUBO$B7A<0$OEy2A$G$"$k$N$G(B, QUBO$B7A<0$r%$%8%s%0%b%G%k$KJQ49$9$k$+$H$,$G$-$k(B.
-$B%$%8%s%0%b%G%k$O<!$N$h$&$KI=8=$5$l$k(B.
+\section{スパース推定}
+スパース推定とは, 多くのパラメータのうちほとんどがゼロでごく一部のみが非ゼロの値をとるように推定する方法である. パラメータのほとんどをゼロにできるのでデータ数の削減と特徴の抽出を行うことができる. また, ニューラルネットワークとは異なり少ないデータから信頼性の高い推定を行うことができる. スパース推定の代表的なものにLASSO(Least Absolute Shrinkage and Selection Operator)があり, データ解析や画像処理の分野で幅広く利用されている. LASSOのコスト関数は次のように表される.
 \begin{eqnarray}
-  H=-\sum_{i,j}{J_{ij}\sigma_{i}\sigma_{j}}-\sum_{i}{h_{i}\sigma_{i}} 
+  S_{\lambda}(\beta)=\|y-X\beta\|^{2}_{2}+\lambda\|\beta\|_{1}
 \end{eqnarray}
-$B$3$3$G(B, $J_{ij}$$B$O(B$i$$BHVL\$H(B$j$$BHVL\$N%9%T%s4V$NFs<!9`$N78?t$G$"$j(B, $h_{i}$$B$O(B$i$$BHVL\$N%9%T%s$N0l<!9`$N78?t$G$"$k(B.
-$B%$%8%s%0%b%G%k$+$i(BQUBO$B7A<0$X$NJQ49$O(B$q_{i}=(\sigma_{i} +1)/2$$B$r7W;;$9$l$P$h$$(B.
+ここで$y$が観測データ, $X$が計画行列, $\beta$が推定するパラメータである. このコスト関数を最小化することでスパース推定を行うことができる. 画像処理では, $\beta$が復元したい画像に対応し, 2項目を$\beta$の二方向の微分に置き換えることで輝度変化の小さい画像を生成することができる.
+
+\subsection{スパース推定を用いたブラックホールシャドウの直接撮像}
+世界中に散らばる８つの電波望遠鏡を同期させることで地球サイズの仮想望遠鏡を構成しブラックホールを観測を行い, 得られた観測データの画像化にスパース推定が用いたれた\cite{black_hole}. 
+\section{QUBO形式とイジングモデル}
+デジタルアニーラで組み合わせ最適化問題を解くためには問題をイジング形式もしくはQUBO形式で表現する必要がある.
+QUBO形式は$q_{i}\in\{ 0,1\}$, イジングモデルは$\sigma_{i}\in\{ -1,+1\}$のバイナリ変数をとり, QUBO形式と等価であるので, $q_{i}=(\sigma_{i} +1)/2$を用いることでQUBO形式をイジングモデルに変換することができる.
+イジングモデルは次のように表現される.
 \begin{eqnarray}
-  H=-\sum_{i,j}{\widetilde{J}_{i,j}q_{i}q_{j}}-\sum_{i}{\widetilde{h}_{i} q_{i}}
+  H=-\sum_{i,j}{J_{ij}\sigma_{i}\sigma_{j}}-\sum_{i}{h_{i}\sigma_{i}}  \label{eq:ising}
 \end{eqnarray}
-\subsection{$q$-loss$B4X?t(B}
-QUBO$B7A<0$X$NDj<02=$r9T$&@h9T8&5f$K$D$$$F@bL@$9$k(B. \ref{}$B$GDs0F$5$l$?(B$q$-loss$B4X?t$O<!$N$h$&$KI=$5$l(B, $B357A$O?^(B\ref{fig:q-loss}$B$N$h$&$K$J$k(B.
+ここで, $J_{ij}$は$i$番目と$j$番目の二体相互作用であり, $h_{i}$は$i$番目の一体相互作用である. また, QUBO形式は次のように表現できる.
+\begin{eqnarray}
+  H=-\sum_{i,j}{\widetilde{J}_{ij}q_{i}q_{j}}-\sum_{i}{\widetilde{h}_{i} q_{i}}
+\end{eqnarray}
+ここで, $\widetilde{J}_{ij}$と$\widetilde{h}_{i}$は式(\ref{eq:ising})と同様に二体相互作用, 一体相互作用であるが$J_{ij}\neq \widetilde{J}_{ij}, h_{i}\neq \widetilde{h}_{i}$である.
+
+このQUBO形式を用いることでAND,OR,NOT回路を表現することが可能である.
+
+\section{QUBO形式の定式化}
+この章ではQUBO形式の定式化の方法について説明を行う.
+
+\subsection{$q$-loss関数} \label{sec:q-loss}
+ここでは, \cite{bib:q-loss}で提案された$q$-loss関数のQUBO形式の定式化の方法について説明する. $q$-loss関数の概形は図\ref{fig:q-loss}のようになる.
 \begin{eqnarray}
   L_{q}(m)=\min{[(1-q)^{2}, (\max{[0,1-m]})^{2}]} \label{eq:q-loss_before}
 \end{eqnarray}
-$B$3$3$G(B, $q$$B$O(B$(\infty,0]$$B$N%Q%i%a!<%?$G$"$j(B, $m$$B$OO"B3JQ?t$G$"$k(B. $BO@J8$G$O(B, $q$-loss$B4X?t$rMQ$$$?J,N`LdBj$r9T$&$3$H$G(B, $B%i%Y%k%N%$%:$KBP$7$F(B$q$-loss$B4X?t$O!V%m%P%9%H@-!W$r;}$D$3$H$,3NG'$G$-$?(B. $B$7$+$7(B, $B$3$N(B$q$-loss$B4X?t$O(B$\max$$B4X?t$r4^$s$G$$$k$?$a(BQUBO$B7A<0$X$N<BAu$,MF0W$G$O$J$+$C$?(B. $B$=$3$G(BDenchev$BEy$O(BLegendre$BJQ49$rE,MQ$9$k$3$H$G<0(B(\ref{eq:q-loss_before})$B$r<0(B(\ref{eq:q-loss})$B$X$HJQ49$7$?(B.
-\begin{eqnarray}
-  L_{q}(m)=\min_{t}{\left\{ (m-t)^{2}+(1-q)^{2}\frac{2}{(1-sign(t-1))}\right\} } \label{eq:q-loss}
-\end{eqnarray}
-$B$3$3$G(B$t$$B$O(BLegendre$BJQ49$r9T$&2aDx$GDI2C$7$?JQ?t$G$"$k(B. sign$B4X?t$OFs?J?tE83+$r$9$k$H0lBN$GI=8=$9$k$3$H$,2DG=$G$"$j(B, $BO"B3JQ?t(B$m$$B$H(B$t$$B$K$D$$$F$bF1MM$KFs?J?tE83+$r9T$&$3$H$G(B, $B<0(B(\ref{eq:q-loss})$B$r(BQUBO$B7A<0$KJQ49$9$k$3$H$,2DG=$G$"$k(B. $BO"B3JQ?t$NFs?J?tE83+$N>\:Y$K$D$$$F$O(B
+\begin{figure}[htbp]
+  \begin{center}
+    \vspace{-3cm}
+    \includegraphics[keepaspectratio, scale=0.3]{q-loss.eps}
+    \vspace{1.7cm}
+    \caption{$q$-loss関数の概形}
+    \label{fig:q-loss}
+  \end{center}
+\end{figure}
+
+ここで, $q$は$(-\infty,0]$のパラメータであり, $m$は連続変数である.
   
-\subsection{ReLU$B%?%$%W4X?t(B}
+論文中では, 二値分類問題を例として$q$-loss関数の特性について説明を行っている. 図\ref{fig:q-loss}からわかるように, 間違った分類に対するペナルティを一定にすることによってラベルノイズによって識別境界が大きく変化することを防ぎ, ロバスト性を確保することができる. しかし, この$q$-loss関数は$\max$関数を含んでいるためQUBO形式への実装が容易ではなかった. そこでDenchev等はLegendre変換を適用することで式(\ref{eq:q-loss_before})を式(\ref{eq:q-loss})へと変換した.
+\begin{equation}
+  L_{q}(m)=\min_{t}{\left\{ (m-t)^{2}+(1-q)^{2}\frac{(1-\textrm{sign}(t-1))}{2}\right\} } \nonumber \\
+  \label{eq:q-loss}
+\end{equation}
+ここで$t$はLegendre変換を行う過程で追加した変数である. sign関数は二進数展開をすると一体で表現することが可能であり, 連続変数$m$と$t$についても同様に二進数展開を行うことで式(\ref{eq:q-loss})をQUBO形式に変換することが可能である.
+  
+\subsection{ReLUタイプ関数}　\label{sec:ReLU}
+ReLUタイプ関数\cite{bib:relu}は次のように表され, 概形は図\ref{fig:relu_type}のようになる.
+\begin{eqnarray}
+  f_{ReLU}(m)=-\min{\{0,m\} } \label{eq:relu-type_before}
+\end{eqnarray}
 
-\section{$L_{1}$$B%N%k%`$N(BQUBO$B7A<0(B}
+\begin{figure}[htbp]
+  \begin{center}
+    \vspace{-1cm}
+    \includegraphics[keepaspectratio, scale=0.45]{relu_type.eps}
+    \vspace{0.6cm}
+    \caption{ReLUタイプ関数の概形}
+    \label{fig:relu_type}
+  \end{center}
+\end{figure}
 
-\section{$B4XO"8&5f(B}
-\subsection{Non-Stoquastic$B%O%_%k%H%K%"%s(B}
+式(\ref{eq:relu-type_before})に対して\ref{sec:q-loss}と同様にLegendre変換を適用する次のように変換できる.
+\begin{eqnarray}
+  f_{ReLU}(m)=-\min_{t}{\{-mt\}} \quad \textrm{s.t.} \quad -1\leq t\leq 0 \label{eq:relu-type_after}
+\end{eqnarray}
+ここで$t$はLegendre変換を行う過程で追加した変数である.
+
+式(\ref{eq:relu-type_after})は二進数展開を行うことでQUBO形式に変換することができるが, この形式では不適切である. なぜなら, ReLUタイプ関数はコスト関数のペナルティ項としてよく用いられるため最適化問題全体は複数のコスト関数を組み合わせたものになるが, 式(\ref{eq:relu-type_after})ではmin関数にマイナス符号がついているため複数のコスト関数を組み合わた最適化問題を解くことができない.
+\begin{eqnarray}
+  &&\min_{m}{\left\{ C(m)+f_{ReLU}(m)\right\} } \nonumber \\
+  &=&\min_{m}{\left\{ C(m)-\min_{t}{\{ -mt\} }\right\} } \nonumber \\
+  &\neq & \min_{m,t}{\left\{ C(m)-(-mt)\right\} }
+\end{eqnarray}
+そこで, この論文ではWolfeの双対定理を式(\ref{eq:relu-type_after})に適用することで次の式が導出された.
+\begin{eqnarray}
+  f_{ReLU}(m) &=& \min_{t,z_{1},z_{2}}{\{ mt+z_{1}(t+1)-z_{2}t} \nonumber \\
+    && \qquad \quad -M(-m-z_{1}+z_{2})^{2} \} \label{eq:relu-type-function}
+\end{eqnarray}
+ここで$M$は大きな正の定数である. この式(\ref{eq:relu-type-function})であれば$\min$関数にマイナス符号がついていないので複数のコスト関数を組み合わせることが可能になる.
+
+\section{量子アニーリング}
+\subsection{断熱量子計算}
+断熱量子計算は組み合わせ最適化問題を解くために量子アニーリングで用いられる手法である. 量子アニーリングでは基底状態を与えるハミルトニアンから最適化した問題に対応するハミルトニアンへと基底状態を保ちながら断熱変化させることによって最適解を得る. 断熱量子アルゴリズムのハミルトニアンは次のように表現できる.
+\begin{eqnarray}
+  H^{0}(\tau)=(1-\tau)H_{B}+\tau H_{P}
+\end{eqnarray}
+ここで$H_{B}$は自明な基底状態であり, $H_{P}$は解きたい問題のハミルトニアンである. $\tau$を$0$から$1$へとゆっくりと変化させることで基底状態を得ることができる.
+
+量子アニーリングの量子効果の代わりに温度のパラメータを利用して古典コンピュータで量子アニーリングを再現する量子モンテカルロアルゴリズムがあり, 簡単な問題であれば計算を行うことが可能である. 
+
+\subsection{Non-stoquastic}
+Non-stoquasticの問題を量子アニーラで効率的に解く方法についての記述を論文を含めて説明
+
+\subsection{単一/マルチ量子ビット補正}
+量子アニーリングであるD-Waveはシステム内のノイズにより, 基底状態に近接する非最小エネルギー状態に対応する量子ビット値を返還してしまう. この問題を解決するためにD-Waveから返還された量子ビット値に対してよりエネルギーが小さい状態を作成する発見的なアプローチを新たに提案した\cite{SQC, MQC}.
+
+単一量子ビット補正(Single-Qubit Correction)では, D-Waveから返還された各量子ビットに対してビット反転を行い元の状態よりも低いエネルギーの状態を探索する. また, SQCを発展させたマルチ量子ビット補正(Multi-Qubit Correction)ではいくつかの量子ビットを１つのグループとし, 同時にビット反転をさせることでより低いエネルギー状態の探索を行っていた. MQCでは副次的な目標としていた基底状態の量子ビット値のパターンの発見はできなかったが, SQMよりも低いエネルギー状態の量子ビット値を高い確率で求めていた.
 
 
-%pLaTeX 2e $BMQ$N%9%?%$%k%U%!%$%k$G$9!#(B
+
+%pLaTeX 2e 用のスタイルファイルです。
 %mabst.sty
 %mabst\_sample.tex
-%$BJ8;z%3!<%I$O(BEUC-JP$B$K$J$C$F$^$9!#E,Ev$J%3!<%I$KJQ49$7$F;H$C$F$/$@$5$$!#(B
+%文字コードはEUC-JPになってます。適当なコードに変換して使ってください。
 
-\section{$B4XO"$9$k8&5f$K$D$$$F(B}
+\section{今後の予定}
+卒業論文でスパース推定で用いられる$ell_{1}$正則化項のQUBO形式での導出を行い, 計算に必要なスピン数の削減と連続変数を用いた数値実験を行った. そこで今後はデジタルアニーラの特性を合わせつつ, 量子ビット補正やNon-stoquasticの考え方をアルゴリズムに活かせるかどうかを検討する.
 
-A4$B#2%Z!<%8$G:n@.$7$F$/$@$5$$!#(B
-$BI=!&N"$N#1Kg$K0u:~$7!"Ds=P$7$F$/$@$5$$!#(B
-
-\section{$B#2CJAH$N46$8(B}
-
-
-%\section*{$B30ItH/I=(B}
+%\section*{外部発表}
 %\begin{enumerate}
-%\item $B$[$2$[$2(B: $B$[$2$[$2(B, 2009.
+%\item ほげほげ: ほげほげ, 2009.
 %end{enumerate}
 
 \begin{thebibliography}{99}
-\label{sannkoubunnkenn_chapter}
 
-%% $BDx8&5f<<;29MJ88%7A<0(B
+%% 程研究室参考文献形式
 
-% $B3X=Q;(;oO@J8(B
-\bibitem{ChengXX}
-$B$[$2$[$2(B: $B$"$Y$PF~Lg(B, $B2?$i$+=PHG<R(B, 200?$BG/(B?$B7n(B.
-
-
+  % 学術雑誌論文
+  
+\bibitem{DA}
+  M. Aramon, G. Rosenberg, E. Valiante, T. Miyazawa, H. Tamura, H. G. Katzgraber, Front. Phys. 00048 (2019)
+\bibitem {NP_problem}
+  A. Lucas, Front. Phys. 2, Article 5 (2014)
+\bibitem{d-wave01}
+  M. W. Johnson, M. H. S. Amin, S. Gildert, T. Lanting, F. Hamze, N. Dickson, R. Harris, A. J. Berkley, J. Johansson, P. Bunyk, E. M. Chapple, C. Enderud, J. P. Hilton, K. Karimi, E. Ladizinsky, N. Ladizinsky, T. Oh, I. Perminov, C. Rich, M. C. Thom, E. Tolkacheva, C. J. S. Truncik, S. Uchaikin, J. Wang, B. Wilson and G. Rose, Nature 473, 194 (2011).
+\bibitem{d-wave02}
+  P. I. Bunyk, E. Hoskinson, M. W. Johnson, E. Tolkacheva, F. Altomare, A. J. Berkley, R. Harris, J. P. Hilton, T. Lanting, J. Whittaker, IEEE Trans. Appl. Supercond. 24, 1700110 (2014).
+\bibitem{bib:q-loss}
+  V. Denchev, N.Ding, S. V. N Vishwanathan, and H. Neven, in Proceedings of the 29th International Conference on Machine Learning, p.863 (2012).
+\bibitem{bib:relu}
+  G. Sato, M. Konoshima, T. Ohwa, H. Tamura, and J. Ohkubo, Phys. Rev.E 99, 042106 (2019).
+\bibitem{black_hole}
+  M. Honma, K. Akiyama, F. Tazaki, K. Kuramochi, S. Ikeda, K. Hada,
+  and M. Uemura, J.Phys.: Conf. Ser. 699, 012006 (2016).
+\bibitem{nonst01}
+  L. Hormozi, E. W. Brown, G. Carleo, and M. Troyer , Phys. Rev. B 95, 184416 (2017).
+\bibitem{nonst02}
+  H. Nishimori, K. Takada \\
+  https://arxiv.org/abs/1609.03785.
+\bibitem{SQC} % 単一量子ビット補正についての論文
+  J. E. Dorband \\
+  https://arxiv.org/abs/1705.01942
+\bibitem{MQC} % マルチ量子ビット補正についての論文
+  J. E. Dorband \\
+  https://arxiv.org/abs/1801.04849
 \end{thebibliography}
 
 \end{document}
