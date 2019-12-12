@@ -1,0 +1,72 @@
+# -*- coding: utf-8 -*-
+
+import numpy as np
+import sys
+
+class Quantum_MonteCarlo: # 量子モンテカルロアルゴリズムの計算を行う
+    def __init__(self): # 各インスタンス変数の初期化
+        self.NumInte = 7                           # 整数部のビット数
+        self.NumDec  = 4                           # 小数部のビット数
+        self.bits    = self.NumInte+self.NumDec+1  # 1変数あたりに使用するビット数
+        self.Type    = 'V'                           # 問題のタイプを表す 'V':'連続変数', 'G':'グラフ'
+
+    def Change_NumInte(self, Num): # 整数部のビット数を変更
+        if (self.Type == 'V'):
+            self.NumInte = Num
+            self.bits = self.NumInte+self.NumDec+1
+            print('整数部：%dbits, 小数部：%dbits' % (self.NumInte, self.NumDec))
+
+    def Change_NumDec(self, Num): # 小数部のビット数を変更
+        if (self.Type == 'V'):
+            self.NumDec = Num
+            self.bits = self.NumInte+self.NumDec+1
+            print('整数部：%dbits, 小数部：%dbits' % (self.NumInte, self.NumDec))
+
+    def Change_Type(self): # 問題のタイプを変更する
+        if (self.Type == 'V'): # 連続変数 -> グラフ
+            self.Type = 'G'
+            self.NumInte = 0
+            self.NumDec = 0
+            self.bits = 1
+            print('問題のタイプをグラフに変更しました.')
+        else:                # グラフ -> 連続変数
+            self.Type = 'V'
+            self.NumInte = 7
+            self.NumDec = 4
+            self.bits = self.NumInte+self.NumDec+1
+            print('問題のタイプを連続変数に変更しました.')
+
+    #def Make_DataSet(self, *array): # 問題の解をarrayとする
+
+    #def Set_Matrix_G(self): # グラフ問題の場合、行列の各要素が頂点間の重みに対応する
+        
+    #def Set_Matrix_V(self): # 連続値を用いた最適化問題の場合、二変数間の積の係数が行列の要素に対応する
+
+class DataSet:
+    def __init__(self, DIM=5, NumData=100): # DIM次元のデータセット'X'と正解のラベル'y'を作成する データ数はデフォルトで100個
+        self.CostFunction = []
+        self.DIM = DIM
+        self.NumData = NumData
+        X = np.zeros((DIM, NumData))
+        y = None
+        answer = np.random.normal(0, scale=32, size=DIM)
+        
+        for i in range(DIM):
+            X[i,:] = np.random.normal(0, scale=1, size=NumData)
+            if y is None:
+                y  = answer[i]*X[i,:]
+            else:
+                y += answer[i]*X[i,:]
+        return X, y, answer
+
+    def Append_CostFunction_LS(self, ):
+
+if __name__ == '__main__':
+    import mglearn
+
+    # X[DIM,NumData]:問題のデータセット, y[NumData]:問題のラベル, A[NumData]:問題の解
+    X, y, A= Make_DataSet(5, 10)
+    Make_Matrix()
+    p = Quantum_MonteCarlo()
+    print('グラフ問題を作成する')
+    DIM = 5 # 頂点の数を設定する     
