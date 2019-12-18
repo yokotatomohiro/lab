@@ -23,17 +23,15 @@ IsingModel={
 
 # 量子ビットのクラス
 class Qbits():
-    def set_qbits(self, DIM, bits):
-        self.qbits     = np.zeros((DIM, bits), dtype=np.int0)
-        self.qbits_np  = np.zeros(DIM*bits, dtype=np.int0)
-        self.qbits_pre = np.zeros((DIM, bits), dtype=np.int0)
-        self.qbits_pre_np = np.zeros(DIM*bits, dtype=np.int0)
+    def set_qbits(self, DIM):
+        self.qbits     = np.zeros(DIM, dtype=np.int0) # ビット反転後の量子ビット値
+        self.qbits_pre = np.zeros(DIM, dtype=np.int0) # ビット反転前の量子ビット値
 
-    def qbit_inverse(self):
+    def qbit_inverse(self): # １つの量子ビットをビット反転させる
         random = randint(self.qbits.size)
         self.qbits[random] = 1 ^ self.qbits_pre[random]
 
-    def qbits_inverse(self, Num): # ビット反転を行うビット数
+    def qbits_inverse(self, Num): # 複数の量子ビットをビット反転させる
         random_set = set()
 
         while len(random_set) < Num:
@@ -41,6 +39,9 @@ class Qbits():
             
         for i in random_set:
             self.qbits[i] = 1 ^ self.qbits_pre[i]
+
+    def qbits_reset(self): # 
+        self.qbits = self.qbits_pre
         
 class Detale(): # 詳細な条件の設定
     def __init__(self):
@@ -93,20 +94,19 @@ class DataSet():
                 self.X[j][i] = df.iat[j][i]
             self.y[i] = df.iat[DIM+1][i]
 
-class Ising_Model(Qbits, Detale, DataSet): # イジングモデルを作成するクラス
-    def Set_Ising_Model_Lasso(self, Lamnda=1, M=100):
+class Ising_Model(Qbits, Detale, DataSet): # イジングモデルを作成するクラス（まだ二進数展開をしない）
+    def Set_Ising_Model_Lasso(self, Lamnda=1, M=100): # コスト関数にlassoを設定する
+        
         self.qbits(self.DIM*self.bits*3) # 量子ビットを設定する（次元数×1変数あたりのビット数×3）
 
         # 最小二乗法の部分（定数部を除く）
         # (DIM×3)×(DIM×3)の行列Jを作成する
         self.J = np.zeros((self.DIM*3, self.DIM*3)) # 変数はx,m_1,m_2の順
         J_sub = self.X**2
-        for i in range(self.DIM): # Jの対角成分を埋める
-            self.J[i*3][i*3] += np.sum(J_sub[i,:])
         # (DIM×3)のベクトルhを作成する
         self.h = np.zeros(self.DIM*3) 
         for i in range(self.DIM):
-            self.h[i] += -2*np.sum(self.X[i,:]*self.y) # hの成分を埋める
+            self.h[i*3] += np.sum(J_sub[i,:])-2*np.sum(self.X[i,:]*self.y) # hの成分を埋める
         
         # l-1normの部分
         for i in range(self.DIM): # 目的関数の部分
@@ -122,35 +122,68 @@ class Ising_Model(Qbits, Detale, DataSet): # イジングモデルを作成す�
                 
     
 class Calculate_Cost(Ising_Model):
-    def calculate_initial(self):
+    def calculate_initial(self): # 初回のコストを計算する
         self.cost = 0
-
+        
         # 二体相互作用を計算
-        for j in range(self.J.shape[1]):
-            tmp = 0
-            for i in range(j+1)
-                DIM_i = i*self.bits+1
-                DIM_j = j*self.bits+1
-                bits = 0
-                for k in range(self.bits-1):
-                    for l in range(self.bits-1):
-                        bit   = self.qbits[DIM_i+k]&self.qbits[DIM_j+l]
-                        bits += bit * 2**(2*(self.NumInte-1)-k-l)
-                sign = self.qbits[DIM_i-1]^self.qbits[DIM_j-1]
-                if sign is 0:
-                    tmp = J[i,j]*bits
-                else:
-                    tmp = -J[i,j]*bits
-                self.cost += tmp
-                
+        J_sub = []
+        for i in range(self.J.shape[0]):
+            for j in range(self.J.shape[1]):
+                if J[i][j] is not 0:
+                    coeff = J[i][j]
+                    sign = self.qbits[i*3] ^ self.qbits[j*3]
+                    count_k = 1
+                    for k in range(self.NumInte-1, self.NumDec+1, -1):
+                        count_l = 1
+                        for l in range(self.NumInte-1, self.NumDec+1, -1):
+                            if sign is 0:
+                                J_sub.append( coeff*(self.qbits[i*3+count_k] ^ self.qbits[j*3+count_l])*2**(k+l))
+                            else:
+                                J_sub.append(-coeff*(self.qbits[i*3+count_k] ^ self.qbits[j*3+count_l])*2**(k+l))
+                            count_l += 1
+                        count_k += 1
+        self.cost += np.sum(J_sub)
+        
         # 一体相互作用を計算
-        for i in range(self.h.shape[0]):
-            tmp = 0
-            for 
-            
+        h_sub = []
+        for i in range(self.h.size):
+            if h[i] is not 0:
+                coeff = h[i]
+                count_j = 1
+                for j in range(self.NumInte-1, self.NumDec+1, -1):
+                    if self.qbits[i*3] is 0:
+                        h_sub.append( coeff*(self.qbits[i*3+count_i])*2**j)
+                    else:
+                        h_sub.append(-coeff*(self.qbits[i*3+count_i])*2**j)
+                    count_j += 1  
+        self.cost += np.sum(h_sub)
                 
     def calculate_sub(self):
+        cost = 0      # ビット反転前のコスト
+        cost_pre = 0  # ビット反転後のコスト
+        place = set() # ビット反転した位置を格納する
+        for i in range(self.qbits.size):
+            if (self.qbits[i] ^ self.qbits_pre[i]) is 1:
+                place.add(i // self.bits)
 
+        for i in place:
+            for j in range(self.J.shape[0]):
+                if J[i][j] is not 0:
+                    coeff = J[i][j]
+                    sign = self.qbits[i*3] ^ self.qbits[j*3]
+                    count_k = 1
+                    for k in range(self.NumInte-1, self.NumDec+1, -1):
+                        count_l = 1
+                        for l in range(self.NumInte-1, self.NumDec+1, -1):
+                            if sign is 0:
+                                J_sub.append( coeff*(self.qbits[i*3+count_k] ^ self.qbits[j*3+count_l])*2**(k+l))
+                            else:
+                                J_sub.append(-coeff*(self.qbits[i*3+count_k] ^ self.qbits[j*3+count_l])*2**(k+l))
+                            count_l += 1
+                        count_k += 1
+        self.cost += np.sum(J_sub)
+                    
+        
 
         
 class Annealing(Detale, DataSet):
@@ -158,7 +191,6 @@ class Annealing(Detale, DataSet):
         super().__init_()
 
     def Setup(self):
-        self.qbits(self.bits*self.DIM) # bits*DIMの量子ビット列を作成する
         
 
     def annealing(self, )
@@ -185,4 +217,3 @@ if __name__ == '__main__':
     model.Change_NumInte(3)
     model.qbits_inverse(4)
     print(model.qbits)
-    
