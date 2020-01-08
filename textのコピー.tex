@@ -1,0 +1,435 @@
+%\documentclass{jpsj3}
+\documentclass[fp,twocolumn]{jpsj3}
+%\documentclass[letter,twocolumn]{jpsj3}
+%\documentclass[letterpaper,twocolumn]{jpsj3}
+\usepackage{txfonts}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsmath}
+\usepackage{multirow}
+
+\usepackage{bm}
+\usepackage{color}
+
+\makeatletter
+\@dblfptop 0pt
+\makeatother
+
+\renewcommand{\topfraction}{.85}
+\renewcommand{\bottomfraction}{.60}
+\renewcommand{\textfraction}{.15}
+\renewcommand{\floatpagefraction}{.6}
+
+\title{$\ell_{1}$ノルム関数のQUBO形式の導出}
+
+\author{Tomohiro Yokota$^1$%\thanks{jpsj{\_}edit@jps.or.jp}
+  , Makiko Konoshima$^2$, Hirotaka Tamura$^2$, Jun Ohkubo$^{1,3}$}
+\inst{$^1$Graduate School of Science and Enginnering, Saitama University,
+  255 Shimo-Okubo, Sakura-ku, Saitama-shi, 338-8570, Japan\\
+  $^2$Fujitsu Laboratories Ltd.,
+  4-1-1 Kawasaki, Kanagawa 211-8558, Japan\\
+  $^3$JST, PREST, 4-1-8 Honcho, Kawaguchi, Saitama 332-0012, Japan} %\\
+
+\abst{
+  本稿では量子アニーリングを含むイジングモデルを用いたアニーリング法でのスパース推定を可能にするために、$\ell_{1}$ノルムのQUBO形式での定式化を提案する。定式化には、近年ReLUタイプ関数のQUBO形式を導出するために用いられたLegendre変換とWolfeの双対定理を利用した。さらに$\ell_{1}$ノルムに対して、これらの変換を素朴に適用した場合、余分な変数な変数も現れることが明らかになった。最終的に余分な変数を取り除くことで、より簡略化されたQUBO形式を導出する。
+}
+
+%%% Keywords are not needed any longer. %%%
+%%% \kword{keyword1, keyword2, keyword3, \1dots}
+
+概要
+本稿では量子
+%%%
+
+\begin{document}
+\maketitle
+
+\section{はじめに}
+近年、いくつかの新しいコンピューティングハードウェアが開発、提供されており、代表的なものにカナダのD-Wave.Incの「D-Wave 2000」や富士通の「富士通デジタルアニーラー」などのイジングタイプのアニーリングマシンがある。アニーリングマシンは、最適化問題の近似解を得るために使用される。最適化問題は、データマイニングや機械学習などの様々な研究分野で重要な役割を果たしている。特に、量子アニーリング法は門脇と西森によってすでに提案されており、断熱量子計算と呼ばれる同様の考え方が注目を集めた。最近では実用化のための研究が行われている．機械学習と量子ボルツマンマシンについての議論はBiamonteの論文でされており、ハードウェアとソフトウェアの観点から多くの課題が存在している。その１つにシステムサイズが小さいことが挙げられるが、年々利用可能な量子ビット（もしくは古典ビット）数が増加しており、これによりサイズが大きな最適化問題に対しても取り組むことが可能になった。
+
+上記のアニーリングハードウェアにはQUBO形式が必要である。ハードウェアはイジングタイプのハミルトニアンを基にしているため、元の最適化問題のコスト関数をQUBO形式に変換する必要がある。（QUBO形式とイジングモデルとは等価である。）連続変数については二進数展開を行うことでイジングタイプの変数に変換することができるが、一般的には元のコスト関数を直接QUBO形式に再定式化することはできない。いくつかの再定式化についてはLucasの先行研究によって与えられており、論理ゲートのQUBO形式で表現した。しかし、定量的なQUBO形式の導出方法はまだ見つかっていない。近年では、Legendre変換を用いた$q$-loss関数のQUBO形式の導出がされている。$q$-loss関数はコスト関数のペナルティ項として用いることで機械学習のラベルノイズに対してロバスト性を与えることができる。Legendre変換を用いた$q$-loss関数のQUBO形式への変換には数学的な変換が追加で必要であり、ReLUタイプ関数に対してはそれだけでは不十分であった。Wolfeの双対定理はReLUタイプ関数をQUBO形式に変換するために用いられた。これらの先行研究の結果から、QUBO形式を直接的に導出することができず、場合によっては元のコスト関数に依存したさらなる変換を行う必要がある。
+
+上記に示したように、機械学習のためにQUBO形式を導出する研究がある。もちろん、最適化問題に関連のある研究分野は他にも多くあり、その１つにデータ分析がある。データ分析において「正規化」の概念は重要なものであり、機械学習でも用いられる。例えば、$\ell_{2}$ノルムを用いた線形回帰はRidge回帰と呼ばれており、様々な問題に対して幅広く利用されている。また、$\ell_{1}$ノルムは解に「スパース性」を加えるために用いられ、スパース推定はデータ分析の研究分野で注目されている。スパース推定の代表的なものにLASSOがあり、これは最小二乗法のコスト関数に$\ell_{1}$ノルムを加えるだけで簡単に実装することが可能である。近年では、ブラックホールの分析にスパース推定の考え方が利用されている。ブラックホールのデータサイズはとても小さいため、画像の解像度が低く、直接観測が困難であった。そこで、世界中の電波望遠鏡からブラックホールを同時に観測し、観測されたビックデータに対してスパース推定に基づく方法を適用することで重要な情報のみを抽出した。これによりブラックホールの画像化に成功した。$\ell_{2}$ノルムは二次形式なのでQUBO形式に導出することができるが、$\ell_{1}$ノルムは微分不可能なのでQUBO形式はまだ導出されていない。
+
+本稿では、$\ell_{1}$ノルムのQUBO形式の導出を行う。QUBO形式を導出するためにLegendre変換とWolfeの双対定理を用いる。さらに、前の導出方法を単純に適用するだけでは不十分であり、数値実験と導出の見直しをすることでより単純なQUBO形式を導出できた。新たに導出されたQUBO形式は前のQUBO形式よりも変数の数が少なくなった。このような変数の数の削減は、イジングタイプハードウェアの量子ビット（もしくは古典ビット）数が制限されている現在において重要なことである。
+
+本稿の構成は次のようになる。二章ではQUBO形式とそれに関連する先行研究についての説明を行う。導出で用いる手法については後で説明を行う。三章では$\ell_{1}$ノルムのQUBO形式での導出と数値実験の結果を与える。四章では、本稿の主結果である単純化された$\ell_{1}$ノルムのQUBO形式の提案を行う。このQUBO形式は三章で提案したQUBO形式から変数を削減されている。五章では、結果と今後の作業について説明する。
+
+\section{背景と準備}
+本稿の目的は、$\ell_{1}$ノルムのQUBO形式を導出することである。一章で示したように、$q$-loss関数のQUBO形式での定式化はすでにされている。
+
+\subsection{QUBO形式とイジングモデル}
+\subsection{Legendre変換}
+\subsection{先行研究1:$q$-loss関数}
+\subsection{Wolfeの双対定理}
+\subsection{先行研究2:ReLUタイプ関数}
+\section{$\ell_{1}$ノルムの単純なQUBO形式の導出}
+\subsection{QUBO形式}
+\subsection{数値実験}
+\section{QUBO形式の変数の削減}
+\subsection{Legendre変換で導入した変数の削減}
+\subsection{数値実験}
+\section{おわりに}
+
+\subsection{QUBO and Ising model} %QUBOとIsingモデルについての説明
+Since the QUBO formulation and the Ising model are equivalent, we can be converted to other form if we can be represented one side. The Ising model is represented 
+\begin{eqnarray}
+  H=-\sum_{i,j}{J_{i,j}\sigma_{i}\sigma_{j}}-\sum_{i}{h_{i}\sigma_{i}}
+\end{eqnarray}
+where $\sigma_{i}\in \{-1,+1\}$is a spin variable for $i$-th spin, $J_{ij}\in \mathbb{R}$ a quadratic term of $i$ and $j$, and $h_{i}\in \mathbb{R}$ a liner term of $i$. We can easily converted the Ising model to QUBO formulation, which uses binary variable $q_{i}\in \{0,1\}$, by applying $q_{i}=\frac{\sigma_{i}+1}{2}$ and QUBO formulation is represented as follows:
+
+\begin{eqnarray}
+  H=-\sum_{i,j}{\widetilde{J}_{i,j}q_{i}q_{j}}-\sum_{i}{\widetilde{h}_{i}q_{i}},
+\end{eqnarray}
+
+
+
+%（大久保） q-loss の導出にLegendreを使うので、先に述べておく形にしてみました。節を追加。
+
+\subsection{Legendre transformation}
+
+For reader's convenience, we here give a brief notation for the Legendre transformation.
+
+If a function $f_{L}$ is convex, the Legendre transformation of $f_{L}$, the so-called conjugate function of $f_{L}$, is given as follows:
+\begin{align}
+\label{eq:Legmax}
+f_{L}^{*}(t)=\sup_{x}\{t x - f_{L}(x)\}.
+\end{align}
+That is, the variable $t$ is introduced, and the function for $x$ is transformed to the function for $t$.
+In addition, \eqref{eq:Legmax} is equivalent to following equation:
+\begin{align}
+\label{eq:Legmin}
+f_{L}^{*}(t)=-\inf_{x}\{f_{L}(x) - t x\}.
+\end{align}
+
+
+\subsection{Previous work 1: $q$-loss function}
+
+%（大久保）もう少し節を細かく分けてみましょうか。q-loss と ReLU をわけて、あとはそれらで使った Legendre の定義も書いてみる、など。節のタイトルを変えました。
+Here, a brief review of the previous work by Denchev \textit{et al.} is given \cite{q-loss}.
+the following $q$-loss function was proposed in Ref.~\citen{q-loss}:
+
+\begin{eqnarray}
+  L_{q}(m)=\min{[(1-q)^{2}, (\max{[0,1-m]})^{2}]} \label{q-loss_function}
+\end{eqnarray}
+
+%（大久保）もう少し q-loss についての説明も追加しておきましょうか。
+\noindent
+where $q \in (\infty,0]$ is a parameter and $m$ is a continuous variable. 
+In Ref.~\citen{q-loss}, there is a discussion for the application of the $q$-loss function in machine learning problems, and the $q$-loss function has a robust features against label noise.
+Since Eq.~\ref{q-loss_function} has a $\max$ function, it is not easy to see the QUBO form of the $q$-loss function.
+Denchev \textit{et al.} employed the Legendre transformation,
+and finally the following function was derived\cite{q-loss}:
+
+\begin{eqnarray}
+  L_{q}(m)=\min_{t}{\left\{(m-t)^{2}+(1-q)^{2}\frac{(1-\text{sign}(t-1))}{2}\right\}}, \label{q-loss_function_legendre}
+\end{eqnarray}
+%（大久保）数式の後ろにピリオドかカンマ。ここではカンマ。変数$t$が出てきたので、説明しておきましょう。
+
+where $t$ is an additional variable which is introduced via the Legendre transformation.
+Although the variables $m$ and $t$ in Eq.~\eqref{q-loss_function_legendre} are continuous, the usage of the binary expansions gives the QUBO formulation for the $q$-loss function.
+As for details of the binary expansions, please see Ref.~\citen{q-loss}.
+Note that the sign function in Eq.~\eqref{q-loss_function_legendre} is also expressed as a one-body term when we employ the binary expansion.
+
+
+%（大久保）Wolfeを ReLU の前にもってきました。流れ的に、先に紹介しておいた方がいいかな、と。あと、ここだけは入れ替えたこともあって、もとの文章を残さずに、赤文字だけにしてあります。あと、数式の下付き添え字は、変数なら italic ですが、文字なら non-italic です。あと、多変数にしておきました。Legendreの方は1変数なんですけど・・。
+
+\subsection{Wolfe-duality} \label{sec:wolfe}
+In nonlinear programming and mathematical optimization, the Wolfe duality theorem\cite{wolfe} is used to convert a main problem with inequality constraints to a dual problem.
+For a differentiable objective function and differentiable constraints, 
+the main problem is written as follows:
+\begin{equation}
+  \left\{ \,\,
+  \begin{aligned}
+    & \text{minimize}_{\bm{x}}  \quad  f_{\mathrm{W}}(\bm{x}) \quad \quad \ (\bm{x} \in \mathbb{R}^{n}),\\
+    & \text{subject to}  \ \quad h_{i}(\bm{x})\leq 0 \quad (i=1,2,\dots,l). \label{object_function}
+  \end{aligned}
+  \right.
+\end{equation}
+where $f_{\mathrm{W}}(\bm{x})$ is a certain convex function to be optimized and $h_{i}(\bm{x})$ are convex and inequality constraints. The Lagrangian function for this optimization problem is
+\begin{eqnarray}
+  L(\bm{x},\bm{z})=f_{\mathrm{W}}(\bm{x})+\bm{z}^{T}h(\bm{x}),
+\end{eqnarray}
+where $\bm{z}$ is a vector of the Legendre coefficients. 
+Then, the Wolfe dual theorem means that the minimization problem in Eq.~\eqref{object_function} in equivalent to the following maximization problem:
+\begin{equation}
+  \left\{\,\,
+  \begin{aligned}
+    & \text{maximize}_{\bm{x},\bm{z}}  \quad L(\bm{x},\bm{z}) \quad \quad \quad \ ((\bm{x},\bm{z})\in \mathbb{R}^{n}\times\mathbb{R}^{l}),\\
+    & \text{subject to}  \qquad \nabla L(\bm{x},\bm{z})=0 \quad (\bm{z} \geq 0).
+  \end{aligned}
+  \right.
+\end{equation}
+As shown above, the Wolfe dual theorem transforms the minimization problem to the maximization problem.
+
+
+%（大久保）節を追加しました。
+\subsection{Previous work 2: ReLU-type function}
+\label{sec:ReLU}
+
+%（大久保）適切な引用をしつつ、ですかね？
+In Ref.~\citen{relu}, the QUBO form of the following ReLU-type function was discussed:
+
+\begin{eqnarray}
+  f_{\mathrm{R}}(m)=-\min{(0,m)}. \label{ReLU_function}
+\end{eqnarray}
+%（大久保）数式にピリオドを追加しました。あと、関数 f はこのあと使うので、下付き添え字をつけておきました。
+
+%（大久保）書くなら as follows: ですかね？ 受け身形を使いつつ、英語を少し整えました。
+\noindent
+Note that the function $f_{\mathrm{R}}(m)$ becomes the conventional ReLU function when the variable transformation $m \to -m$ is employed.
+As shown in Ref.~\citen{relu}, a naive application of the Legendre transformation to the function $f(m)$ in Eq.~\eqref{ReLU_function} gives the following expression:
+
+\begin{eqnarray}
+  f_{\mathrm{R}}(m)=-\min_{t}{\{-mt\}} \quad \text{subject to} \quad -1\leq t\leq 0, \label{ReLU_function_legendre}
+\end{eqnarray}
+
+%（大久保）カンマを追加。また、やはり新しい記号の説明。
+\noindent
+where $t$ is a new variable which stems from the Legendre transformation.
+
+%（大久保）英語を整えてみました。あと、次の section にマイナスサインのことが数式で記述されていますが、こっちに書いた方がわかりやすいのでは？ ということで以下のような形ではいかがでしょうか？
+
+Although Eq.~\eqref{ReLU_function_legendre} has the QUBO form, it is not suitable for optimization problems.
+This is because the minus sign before the $\min$ function;
+when the ReLU-type function is used as a kind of constraints or penalty terms for an optimization problem with a cost function $C(m)$, the whole minimization problem is, for example, given as follows:
+\begin{eqnarray}
+  \min_{m} \left\{ C(m)+f_{\mathrm{R}}(m) \right\} &=& \min_{m}\left\{ C(m)-\min_{t} \{-mt\} \right\} \nonumber \\
+  &\neq& \min_{m,t} \left\{C(m)-(-mt)\right\} ,
+\end{eqnarray}
+and hence the cost function $C(m)$ and the ReLU-type function $f_{\mathrm{R}}(m)$ cannot be minimized simultaneously.
+Therefore, the Wolfe duality theorem was employed in Ref.~\citen{relu}, and finally the following formulation was derived:
+\begin{eqnarray}
+  f_{\mathrm{R}}(m)=\min_{t,z_{1},z_{2}} \left\{mt+z_{1}(t+1)-z_{2}t-M(-m-z_{1}+z_{2})^{2}\right\} \label{ReLU_function_wolfe}
+\end{eqnarray}
+where $M$ is a large positive constant. 
+It is easy to see that Eq.~\eqref{ReLU_function_wolfe} can be used with the combination of the cost function $C(m)$.
+
+
+
+\section{Naive derivation of QUBO formulation for $\ell_{1}$-norm} \label{Native_derivation}
+
+%（大久保）もう少し説明を加えてみました。次の節との違いも出したいので。
+
+In this section, the Legendre transformation and the Wolfe dual theorem are applied to the $\ell_{1}$ norm-type function naively. 
+
+
+\subsection{QUBO formulation}
+%（大久保）この部分なのですが、まずは絶対値関数という説明から入りましょうか。あと、素朴にReLUタイプ関数を使えばできるわけですが、それだと変数の数が多くて、というのも書いておいて、だから変数を減らすのが大切そう、という感じで次に繋げてみるのはいかがでしょうか？ 数式の上の文章を以下のような感じに。
+
+Although the $\ell_{1}$-norm is usually denoted as an absolute value of a variable, i.e., $\lvert m \rvert$, here we employ the following function $f(m)$:\\
+\begin{eqnarray}
+  f(m)=-\min{\{-m,m\}} \label{l1-norm}
+\end{eqnarray}
+
+
+%（大久保）で、そのあとに説明を追加。このあたりからこの論文のメインなんですが、かなり簡潔に書きすぎているので、しっかりと書く形にします。短すぎるのはあんまりよくないので。
+
+Note that $f(m)$ can be expressed as follows:
+\begin{eqnarray}
+f(m)=-\min{\{0,m\}} - \min\{-m,0 \} = f_{\mathrm{R}}(m) + f_{\mathrm{R}}(-m),
+\end{eqnarray}
+where $f_{\mathrm{R}}(m)$ is the ReLU-type function in Eq.~\eqref{ReLU_function}.
+Hence, it is easy to obtain the QUBO formulation for $f(m)$ by using the discussion based on Sect.~\ref{sec:ReLU}.
+However, the QUBO formulation needs six additional variables.
+The derivation below enables us to obtain the QUBO formulation for $f(m)$ with only three additional variables.
+
+\begin{equation}
+  f(m)= \left\{
+  \begin{aligned}
+    -m\quad & (m <0), \nonumber \\
+     m\quad & (m\geq 0). 
+  \end{aligned}
+  \right.
+\end{equation}
+
+
+Then, the Legendre transformation in Eq.~\eqref{eq:Legmin} is performed for each domain as follows:
+
+\begin{itemize}
+\item[(a)]$m<0:$ \\
+  The gradient in the domain is always -1. Hence, conjugate function is
+  \begin{equation}
+    f^{*}(t)=-\inf_{m}\{-m - mt\}=-\inf_{m}\{-m(1+t)\}=0. \nonumber
+  \end{equation}
+  And the possible value of $t$ is only $t=-1$.
+\item[(b)]$m=0:$ \\
+  Since the left differentation at this point is $f_{-}'(m)=-1$ and the right differentation is $f_{+}'(m)=1$, the gradient value takes an arbitrary value within $-1$ to $1$. Hence, the conjugate function is $f^{*}(t)=0$ with the domain $t \in [-1,1]$.
+\item[(c)]$m>0:$ \\
+  The gradient in the domain is always 1. Hence, conjugate function is
+  \begin{equation}
+    f^{*}(t)=-\inf_{m}\{m - mt\}=-\inf_{m}\{-m(-1+t)\}=0. \nonumber
+  \end{equation}
+  And the possible value of $t$ is only $t=1$.
+\end{itemize}
+
+From the above discussion, the conjugate function of $f(m)$ is $f^{*}(t)=0\ (-1\leq t\leq 1)$. When we apply the Legendre transformation to $f^{*}(m)$ again, since the function $f(m)$ is convex, $f(m)$ is adequately recovered. Therefore, we could find the quadratic form of $f(m)$ as follows:
+
+\begin{eqnarray}
+  F(m)=-\min_{t}{\{-mt\}} \quad \text{subject to} \quad \-1 \leq t \leq 1 \label{legendre}
+\end{eqnarray}
+In order to emphasize the fact that it is the quadratic form of $f(m)$, we newly introduced $F(m)$ instead of $f(m)$.
+
+%（大久保）この上の部分は前節に移しましたので、不要です。軽く触れるくらいにしましょう。Legendreのところの追記をする予定なので、文章の流れをそれに合わせます。なので、その追記を見て、ですが、例えば下記のような感じになるのかな、と思います。
+
+As shown in Sect.~\ref{sec:ReLU}, although the obtained expression via the Legendre transformation has a quadratic form, it cannot be combined with another cost function.
+Hence, the Wolfe dual theorem is employed;
+the following expression is immediately obtained by applying the Wolfe dual theorem to $F(m)$:
+
+\begin{eqnarray}
+  \widetilde{F}(m)=\max_{t,z_{1},z_{2}} \{-mt-z_{1}(t+1)+z_{2}(t-1)\} \label{wolf}
+\end{eqnarray}
+\begin{equation}
+  \text{subject to} \quad \left\{
+  \begin{aligned}
+   -m-z_{1}&+z_{2}=0, \nonumber \\
+   \ -1\leq t\leq 1, & z_{1}\geq 0, z_{2}\geq 0. \\
+  \end{aligned}
+  \right.
+\end{equation}
+
+%（大久保） following penalty term とあるのですが、次のようなペナルティ項、と言いつつ、いきなり最終的なコスト関数の形が出てくるので文章としておかしいです・・。
+
+This reformulation has the equality constraint, $-m-z_{1}+z_{2}=0$; in order to embed this constraint into the QUBO formulation, it is enough to add the squared term as a penalty. 
+Therefore, the optimization problem (\ref{wolf}) can be represented as follows:
+
+\begin{equation}
+  \begin{aligned}
+    \widetilde{F}(m)&=\min_{t,z_{1},z_{2}}{\{mt+z_{1}(t+1)-z_{2}(t-1)} \\
+    &\quad+M(-m-z_{1}+z_{2})^{2}\} \label{after_wolf} \\
+  \end{aligned}
+\end{equation}
+\begin{eqnarray}
+  \text{subject to} \quad -1\leq t\leq 1, z_{1}\geq 0, z_{2}\geq 0, \nonumber
+\end{eqnarray}
+
+%（大久保）文章が長いので、少し変更。あと、スペルミスも多いかな・・。
+
+\noindent
+where $M$ is a constant and takes a large value to ensure the equality constraint, $-m-z_{1}+z_{2}=0$, to be satisfied.
+Note that there are remaining inequality constraints, $-1\leq t\leq 1, z_{1}\geq 0$, and $z_{2}\geq 0$;
+these inequality constraints can be easily realized by expanding these variables $t,z_{1}$, and $z_{2}$, in the binary expressions which satisfy the corresponding domain constraints respectively.
+
+As a result, the QUBO formulation for the $\ell_{1}$-norm is expressed by using additional three variables.
+
+\subsection{Numerical validation}
+
+
+%（大久保）図を本文中に引用していないので、追記。他、少し書き直し。
+
+
+\section{Reduced QUBO formulation} %定式化の見直し
+\subsection{Reduction of the variable in the Legendre transformation}
+
+
+%（大久保）もう少し丁寧に書いてみました。
+
+As discussed above, the naive application of the Legendre transformation and the Wolfe dual theorem gives the QUBO formulation with three additional variables.
+However, from the numerical experiments in the previous section, it is revealed that the variable $t$, which stems from the Legendre transformation, may not be necessary for the optimization problem.
+Because of the restriction of the number of spin variables, it is preferable to have smaller number of variables in general.
+Hence, here we try further reduction of variable from the QUBO formulation in Eq.~\eqref{after_wolf}. 
+
+In order to achieve the elimination of $t$ from Eq.~\eqref{after_wolf}, we focus on the equality constraint $-m-z_{1}+z_{2} = 0$.
+By employing the equality $z_{2} = m+z_{1}$, we have 
+
+%（大久保）F'(m)としてあったのですが、プライム（ダッシュ）は微分の意味合いなので避けましょうか。ここの式変形は元のチルダのものを変えていった、ということにして、そのあと、最終的な形をして記号を置き直します、それをハットで書きましょうか（別の記号でもかまいません）。それにあわせて図も変更しましょう。
+\begin{alignat}{2}
+  \widetilde{F}(m)&=\min_{t,z_{1},z_{2}}{\{mt+z_{1}(t+1)-z_{2}(t-1)} \nonumber \\
+  &\quad+M(-m-z_{1}+z_{2})^{2}\} \nonumber \\
+  &=\min_{t,z_{1},z_{2}}{\{mt+z_{1}(t+1)-(m+z_{1})(t-1)} \nonumber \\
+  &\quad+M(-m-z_{1}+z_{2})^{2}\} \nonumber \\
+  &=\min_{z_{1},z_{2}}{\{z_{1}+(m+z_{1})+M(-m-z_{1}+z_{2})^{2}\}} \nonumber \\
+  &=\min_{z_{1},z_{2}}{\{z_{1}+z_{2}+M(-m-z_{1}+z_{2})^{2}\}}. 
+\end{alignat}
+
+%（大久保）数式の後の文章は以下のように変えましょうか。
+
+Then, we finally obtain the following simplified QUBO formulation for the $\ell_{1}$-norm:
+\begin{align}
+\widehat{F}(m) = \min_{z_{1},z_{2}}{\{z_{1}+z_{2}+M(-m-z_{1}+z_{2})^{2}\}, \label{review_formulation}}
+\end{align}
+where the new expression $\widehat{F}(m)$ is introduced in order to clarify the difference from Eq.~\eqref{after_wolf}.
+Therefore, this conversion from (\ref{after_wolf}) to (\ref{review_formulation}) is possible because the penalty term, $M(-m-z_{1}+z_{2})^{2}$, forces the equality constraint to be satisfied.
+
+
+\subsection{Numerical validation} %定式化したものを利用して実験を行う
+
+
+\section{Concluding remarks}
+%（大久保）節のタイトルを変えました。オリジナルは「conclusion」で、最初が小文字でしたし・・。
+
+%（大久保）全体的に、主張を強くするために書き足しました。素朴にReLUを使うと変数６個で、でもそれが３つになり、さらに２つになる。それは重要、という話ですね。あと、これは書かなくてもいいのですが、Legendre変換で導入された変数 t が不要だったわけですが・・となると、Legendre変換そのものは必要だったんでしょうか？という疑問も・・。ぱっと考えると、必要だったように思うのですが、どうなんでしょうね・・。自明ではないので、そのあたりも、少し主張を強くするために書いておきました。
+
+
+
+\begin{acknowledgment}
+
+%\acknowledgment
+
+%For enveironments for acknowledgment(s) are available: \verb|acknowledgment|, \verb|acknowledgments|, \verb|acknowledgment|, and \verb|acknowledgments|.
+
+\end{acknowledgment}
+
+%\appndix
+%\section{}
+%Use the \verb|\appendix| command if you need an appendix(es). The \verb|\section| command should follow even though there is no title for the appendix (see above in the source of this file).
+%For authurs of Invited Review Papers, the \verb|profile| command si prepared for the author(s)' profile. A simple example is shown below.
+
+%\begin{verbatim}
+%\profile{Taro Butsuri}{was born in Tokyo, Japan in 1965. ...}
+%\end{verbatim}
+
+\begin{thebibliography}{1}
+% 統一しましょう。First name を省略で書きます。
+\bibitem{d-wave01}
+  M. W. Johnson, M. H. S. Amin, S. Gildert, T. Lanting, F. Hamze, N. Dickson, R. Harris, A. J. Berkley, J. Johansson, P. Bunyk, E. M. Chapple, C. Enderud, J. P. Hilton, K. Karimi, E. Ladizinsky, N. Ladizinsky, T. Oh, I. Perminov, C. Rich, M. C. Thom, E. Tolkacheva, C. J. S. Truncik, S. Uchaikin, J. Wang, B. Wilson and G. Rose, Nature {\bf 473}, 194 (2011).
+\bibitem{d-wave02}
+  P. I. Bunyk, E. Hoskinson, M. W. Johnson, E. Tolkacheva, F. Altomare, A. J. Berkley, R. Harris, J. P. Hilton, T. Lanting, J. Whittaker, IEEE Trans. Appl. Supercond. {\bf 24}, 1700110 (2014).
+\bibitem{DA}
+  M. Aramon, G. Rosenberg, E. Valiante, T. Miyazawa, H. Tamura, and H. G. Katzgraber, arXiv:1806.08815.
+
+% basics for quantum annealing
+\bibitem{Kadowaki1998}
+T. Kadowaki and H. Nishimori, Phys. Rev. E {\bf 58}, 5355 (1998).
+\bibitem{Farhi2001}
+E. Farhi, J. Goldstone, S. Gutmann, J. Lapan, A. Lundgren, and D. Preda, Science {\bf 292}, 472 (2001).
+
+% recent application
+\bibitem{Tanahashi2019}
+K. Tanahashi, S. Takayanagi, T. Motohashi, and S. Tanaka, J. Phys. Soc. Jpn. {\bf 88}
+
+\bibitem{Biamonte}
+J. Biamonte, P. Wittek, N. Pancotti, P. Rebentrost, N. Wiebe and S. Lloyd, Nature {\bf 549}, 195 (2017).
+
+% review
+\bibitem{Lucas2014}
+A. Lucas, Front. Phys. {\bf 2}, 5 (2014).
+
+
+% Logic
+\bibitem{Whitfield}
+J. D. Whitfield, M. Faccin, and J. D. Biamonte, Europhys. Lett. {\bf 99}, 57004 (2012).
+
+
+\bibitem{black-hole}
+% 論文タイトルは引用しないので、統一しましょう。あと [1] で大量の名前を書いているので、こっちも et al. で省略せずに書きましょう。
+%  Mareki Honma et al, Imaging black holes with sparse modeling, J.Phys.: Conf. Ser. {\bf 699} 012006 (2016).
+  M. Honma, K. Akiyama, F. Tazaki, K. Kuramochi, S. Ikeda, K. Hada, and M. Uemura, J.Phys.: Conf. Ser. {\bf 699} 012006 (2016).
+
+\bibitem{q-loss}
+  V. Denchev, N.Ding, S. V. N Vishwanathan, and H. Neven, in Proceedings of the 29th International Conference on Machine Learning, p.863 (2012).
+
+\bibitem{relu}
+% すでに出版されているので、arXivではなくて論文を引用しましょう・・。
+  G. Sato, M. Konoshima, T. Ohwa, H. Tamura, and J. Ohkubo, Phys. Rev. E {\bf 99}, 042106 (2019).
+
+\bibitem{wolfe}
+  P. Wolfe, Quart. Appl. Math. {\bf 19}, 239 (1961).
+\bibitem{lasso}
+% これもタイトル不要。あと、書式の統一。(1)などは Issue番号で、他の文献にもありますが、記載していないので、ここも記載せず、で。あと、ページ番号も他の引用では冒頭のしか書いていないので、それに統一。
+%  Robert Tibshirani, Regression Shrinkage and Selection via the Lasso, J. R. Statist. Soc, B, 58(1):267-288 (1996).
+  R. Tibshirani, J. R. Statist. Soc, B {\bf 58}, 267 (1996).
+  
+\end{thebibliography}
+
+\end{document}
