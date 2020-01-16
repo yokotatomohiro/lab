@@ -3,94 +3,55 @@
 import numpy as np
 from numpy.random import *
 
-class Qbits():
-    def __init__(self, Num):
-        self.size = Num # 量子ビット数の設定を行う
-        self.qbits     = 0
-        self.qbits_tmp = 0 # ビット反転後のビット列
-        self.qbits_min = 0 # コストが最小となるビット列
-        self.cost = 0
-        self.cost_tmp = 0
-        self.cost_min = 0
-        self.mask = None
-
-    def Set_mask(self, array):
-        self.mask = (1 << self.size)-1
-        for i in array:
-            self.mask = self.mask ^ (1 << i)
-
-    def Inverse_qbits(self): # ビット反転を行う
-        self.qbits_tmp = self.qbits ^ (1 << randint(self.size))
-
-        if self.mask is not None: # ビット反転に指定がある場合
-            self.qbits_tmp = self.qbits_tmp & self.mask
-            
-    def Flip_qbits(self): # フリップを行う
-        self.qbits = self.qbits_tmp
-        self.cost = self.cost_tmp
-
-    def Update_qbits_min(self): # 最小のビット列を更新する
-        self.qbits_min = self.qbits
-        self.cost_min = self.cost
-'''
-class Annealing():
+class Detale():
     def __init__(self):
-        # 一変数あたりに使用する量子ビット数の指定
-        self.NumInte = 7
-        self.NumDec  = 4
-        self.bits    = self.NumInte+self.NumDec+1
+        # 一変数あたりに使用するビット数の指定
+        self.NumInte = 7 # 整数部のビット数
+        self.NumDec  = 4 # 小数部のビット数
+        self.bits    = self.NumInte+self.NumDec+1 # 符号部を含めた全体のビット数
 
-        # 問題の設定を行う
-        self.DIM     = 5
-        self.NumData = 100
-        self.X       = None
-        self.y       = None
-        self.answer  = None
+        # データセットの詳細についてい
+        self.DIM     = 5    # データセットの次元数
+        self.NumData = 100  # データセットのデータ数
+        self.X       = None # 計画行列
+        self.y       = None # 
+        self.answer  = None # 解
 
-        # QUBO形式の設定を行う
-        self.J       = None
-        self.h       = None
-        self.J_qbits = None
-        self.h_qbits = None
-        self.array   = [] # ビット反転をさせない位置を格納
+        self.J       = None # 連続値の二体相互作用対応表
+        self.h       = None # 連続値の一体相互作用対応表
+        self.J_qbits = None # 離散値の二体相互作用対応表
+        self.h_qbits = None # 離散値の一体相互作用対応表
+        self.mask    = 0    # 離散値にいてビット反転させてはいけない位置のマスクビット列
 
-        # アニーリングのスケジュール
-        self.T = 100
-        self.alpha = 0.999
-        self.iteration = 100
-
-    # 一変数あたりのビット数を変更する
-    def Change_bits(self, NumInte=None, NumDec=None):
+    def change_bits(self, NumInte=None, NumDec=None):
         if NumInte is not None:
             self.NumInte = NumInte
         if NumDec is not None:
             self.NumDec = NumDec
         self.bits = self.NumInte+self.NumDec+1
 
-    # 生成するデータセットの次元とデータ数を変更する
-    def Change_detale(self, DIM=None, NumData=None):
+    def change_dataset(self, DIM=None, NumData=None):
         if DIM is not None:
             self.DIM = DIM
         if NumData is not None:
             self.NumData = NumData
 
-    # データセットを作成する
-    def Make_dataset(self, scale=None, noise=None):
+    def make_dataset(self, scale=None, noise=0):
+        # データセットの初期化
         self.X = np.random.normal(0,1,(self.DIM,self.NumData))
         self.y = np.zeros(self.NumData)
-        
+
         if scale is None:
             scale = 2**(self.NumInte-1)
-        self.answer = np.random.normal(0,scale,self.NumData)
+        self.answer = np.random.normal(0,scale,self.DIM)
 
         for i in range(self.DIM):
             self.y += self.answer[i]*self.X[i,:]
 
-        if noise is not None:
-            self.y += np.random.normal(0,noise,self.NumData)
+        self.y += np.random.normal(0,noise,self.NumData)
 
-    # lassoのコストを設定する
-    def Set_lasso(self, Lambda=1, M=100):
+    # lassoのコスト関数を設定する
+    def set_lasso(self, l=1, m=100):
         size = self.DIM*3
 
         self.J = np.zeros((size,size))
@@ -100,25 +61,26 @@ class Annealing():
 
         # 最小二乗法のコスト関数を設定 yは定数なので除く
         for i in range(self.DIM):
-            self.J[i*3] += np.sum(J_sub[i,:])
-            self.h[i*3] += -2*np.sum(self.X[i,:]*self.y)
+            self.J[i*3,i*3] += np.sum(J_sub[i,:])
+            self.h[i*3    ] += -2*np.sum(self.X[i,:]*self.y)
 
-        # l1ノルムのコスト関数
+        # l1ノルムのコスト関数を設定
         for i in range(self.DIM):
-            self.h[i*3+1] += Lambda
-            self.h[i*3+2] += Lambda
+            self.h[i*3+1] += l
+            self.h[i*3+2] += l
 
-        # l1ノルムのペナルティ項
+        # l1ノルムのペナルティ項を設定
         for i in range(self.DIM):
             for j in range(3):
-                self.J[i*3+j,i*3+j] += M*Lambda
-            self.J[i*3  ,i*3+1] +=  2*M*Lambda
-            self.J[i*3  ,i*3+2] +=  2*M*Lambda
-            self.J[i*3+1,i*3+2] += -2*M*Lambda
-            
-        # 連続値 -> 離散値 に変換する 
-        self.J_qbits = np.zeros((size*self.bits,size*self.bits))
-        self.h_qbits = np.zeros(size*self.bits)
+                self.J[i*3+j,i*3+j] += m*l
+            self.J[i*3  ,i*3+1] += 2*m*l
+            self.J[i*3  ,i*3+2] += -2*m*l
+            self.J[i*3+1,i*3+2] += -2*m*l
+
+        # 連続値 -> 離散値に変換する
+        size_qbits = size*self.bits
+        self.J_qbits = np.zeros((size_qbits,size_qbits))
+        self.h_qbits = np.zeros(size_qbits)
 
         for i in range(size):
             for j in range(size):
@@ -134,75 +96,95 @@ class Annealing():
                 for j in range(1,self.bits):
                     self.h_qbits[i*self.bits+k] = self.h[i]*(2**(self.NumInte-j))
 
-        for i in range(size):
-            self.array.append((3*i*self.bits)+self.bits)
-            self.array.append((3*i*self.bits)+self.bits*2)
+        # ビット反転させてはいけない位置を格納
+        self.mask = (1 << size_qbits)-1
+        for i in range(self.DIM):
+            self.mask = self.mask ^ (1<<((3*i+1)*self.bits))
+            self.mask = self.mask ^ (1<<((3*i+2)*self.bits))
 
-    def Calculate(self, qbits):
-        cost = 0
-        place = []
-        for i in range(self.h_qbits.size):
-            if((qbits >> i) & 1) == 1:
-                place.append(i)
-                
-        J_sub = []
-        for i in place:
-            for j in place:
-                if self.J_qbits[i,j] != 0:
-                    J_sub.append(self.J_qbits[i,j])
-        cost += np.sum(J_sub)
+# ビット反転を行う
+def inverse_qbits(qbits, size, mask=None, Num=1): # qbits:量子ビット列, size:量子ビット数, mask:マスク, Num:ビット反転を行う数
+    tmp = qbits
+    if mask is None:
+        for i in range(Num):
+            tmp = tmp ^ (1 << randint(size))
+    else:
+        while(1): # 少なくとも１つはビット反転する
+            for i in range(Num):
+                tmp = tmp ^ (1 << randint(size))
+            if mask is not None:
+                tmp = tmp & mask
+            if tmp != qbits:
+                break
+        return tmp
 
-        h_sub = []
-        for i in place:
-            if self.h_qbits[i] != 0:
-                h_sub.append(self.h_qbits[i])
-        cost += np.sum(h_sub)
+# コストの計算を行う
+def calculate_discrete(qbits, J, h): # qbits:量子ビット列(int型), J:[ビット数,ビット数], h:[ビット数]
+    cost = 0
+    size = h.size
+    place = []
+    for i in range(size):
+        if ((qbits>>i) & 1) != 0:
+            place.append(i)
 
-        return cost
+    sub = []
+    for i in place:
+        for j in place:
+            if J[i,j] != 0:
+                sub.append(J[i,j])
+        if h[i] != 0:
+            sub.append(h[i])
 
-    def Change_anneal(self, T=None, alpha=None, iteration=None):
-        if T is not None:
-            self.T = T
-        if alpha is not None:
-            self.alpha = alpha
-        if iteration is not None:
-            self.iteration = iteratio
+    return np.sum(sub)
 
-    def Update_anneal(self):
-        self.T *= self.alpha
+def Annealing(detale, iteration=100, T=10000, alpha=0.995):
+    size = detale.h_qbits.size
+    qbits = 0
+    qbits = inverse_qbits(qbits, size, detale.mask, size)
+    cost = calculate_discrete(qbits, detale.J_qbits, detale.h_qbits)
+    min_qbits = qbits
+    min_cost = cost
 
-    def flip_check(self, diff_cost):
-        if diff_cost < 0:
-            return True
+    for i in range(iteration):
+        T *= alpha
+        tmp = inverse_qbits(qbits, size, detale.mask)
+        tmp_cost = calculate_discrete(tmp, detale.J_qbits, detale.h_qbits)
+        diff = tmp_cost - cost
+        if diff < 0:
+            qbits = tmp
+            cost = tmp_cost
         else:
-            if rand() < np.exp(diff_cost/self.T):
-                return False
+            if rand() < np.exp(diff/T):
+                pass
             else:
-                return True
+                qbits = tmp
+                cost = tmp_cost
 
-    def annealing(self):
-        qbits = Qbits(self.h_qbits.size)
-        qbits.Set_mask(self.array)
-        
-        for i in range(self.iteration):
-            self.Update_anneal()
-            qbits.Inverse_qbits()
-            qbits.cost_tmp = self.Calculate(qbits.qbits_tmp)
+        if min_cost > cost:
+            min_qbits = qbits
+            min_cost = cost
 
-            diff = qbits.cost_tmp - qbits.cost
 
-            if self.flip_check(diff) is True:
-                qbits.Flip_qbits()
-            if qbits.cost_min > qbits.cost:
-                qbits.Update_qbits_min()
+    print(min_cost)
+    print(bin(min_qbits))
 
-        print(bin(qbits.qbits_min))
-'''
-                
+def print_discrete(detale, qbits): # 離散値->連続値にして表示する
+    Num = detale.h_space/(detale.bits*detale.DIM)
+    
+    for i in range(detale.DIM):
+        for j in range(Num):
+            value = 0
+            if ((qbits >> i*detale.bits*Num) & 1) == 1
+            value = -1<<detale.NumInt
+            
+
 if __name__ == '__main__':
-    a = Qbits(5)
-    print(bin(a.qbits))
-    for i in range(5):
-        a.Inverse_qbits()
-        a.Flip_qbits()
-        print(bin(a.qbits))
+    a = Detale()
+    a.change_bits(1,1)
+    a.make_dataset()
+    a.set_lasso()
+    
+    print(a.answer)
+
+    Annealing(a)
+
