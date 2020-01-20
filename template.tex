@@ -8,26 +8,27 @@
 \usepackage{lmodern}
 \usepackage{textcomp}
 \usepackage{latexsym}
-%\usepackage[fleqn]{amsmath}
-%\usepackage{amssymb}
+\usepackage[fleqn]{amsmath}
+\usepackage{amssymb}
 
 \setcounter{page}{1}
 
-\field{}
+\field{A}
 \jtitle{イジング計算機での利用に向けた$l1$ノルムのQUBO形式について}
-\etitle{}
+\etitle{QUBO formulation of l1-norm for Ising-type computers}
 \authorlist{%
- \authorentry{aaa}{Tomohiro Yokota}{}\MembershipNumber{}
+ \authorentry{横田 知大}{Tomohiro Yokota}{埼玉}\MembershipNumber{111111}
  %\authorentry{和文著者名}{英文著者名}{所属ラベル}\MembershipNumber{}
  %\authorentry[メールアドレス]{和文著者名}{英文著者名}{所属ラベル}\MembershipNumber{}
  %\authorentry{和文著者名}{英文著者名}{所属ラベル}[現在の所属ラベル]\MembershipNumber{}
 }
-\affiliate[]{}{}
+\affiliate[埼玉]{埼玉}{Saitama}
 %\affiliate[所属ラベル]{和文所属}{英文所属}
 %\paffiliate[]{}
 %\paffiliate[現在の所属ラベル]{和文所属}
 
 \begin{document}
+
 \begin{abstract}
   本稿では量子アニーリングを含むイジングモデルを用いたアニーリング法においてスパース推定を可能にするために、近年ReLUタイプ関数のQUBO形式を導出するために用いられたLegendre変換とWolfeの双対定理を利用した。さらに$l1$ノルムに対してこれらの変換を素朴に適用した場合、余分な変数も現れることが明らかになった。最終的に余分な変数を取り除くことで、より簡略化されたQUBO形式を導出する。
 \end{abstract}
@@ -56,19 +57,18 @@
 \section{l1ノルムとスパース推定}
 スパース推定とは、多くのパラメータのうちほとんどが$0$で、ごく一部のみ非$0$の値をとるように推定する方法である。スパース性を持つ推定方法の代表的なものにLeast Absolute Shrinkage and Selection Operator(LASSO)がある。LASSOでは、次の式をコスト関数としてコストが最小となるような回帰係数ベクトル$\beta$を推定をする。
 \begin{eqnarray}
- S_{\lambda}(\beta) &=& \|y-X\beta\|^{2}_{2} + \lambda\|\beta\|_{1} \nonumber \\
- &=& (y-X\beta )^{T}(y-X\beta )+\lambda(|\beta_{1}|+|\beta_{2}|+\dots +|\beta_{p}|) \label{lasso}
+ S_{\lambda}(\beta) &=& \frac{1}{2n}\|y-X\beta\|^{2}_{2} + \lambda\|\beta\|_{1} \label{lasso}
 \end{eqnarray}
-ここで、$y$は$y\in\mathbb{R}^{n}$次元の観測ベクトル、Xは$X\in\mathbb{R}^{n\times p}$次元の計画行列、$\beta$は$\beta\in\mathbb{R}^{p}$の回帰係数ベクトル、$\lambda$は$\lambda >0$の正則化パラメータである。LASSOのコスト関数は最小二乗法のコスト関数に$l_{1}$ノルムを加えた単純な形であり、最小二乗法と比較して、汎化性能が高く過学習を抑えることができる。
+ここで、$y$は$y\in\mathbb{R}^{n}$次元の観測ベクトル、$X$は$X\in\mathbb{R}^{n\times p}$次元の計画行列、$\beta$は$\beta\in\mathbb{R}^{p}$の回帰係数ベクトル、$\lambda$は$\lambda >0$の正則化パラメータである。LASSOのコスト関数は最小二乗法のコスト関数に$l_{1}$ノルムを加えた単純な形であり、最小二乗法と比較して、汎化性能が高く過学習を抑えることができる。
 
 \section{QUBO形式とイジングモデル}
 一章で説明したように，アニーリングマシンはイジングモデルという物理モデルがハードウェアとして実装されており，アニーリングを高速で実行することで近似最適解を出力する．イジングモデルは次のエネルギー関数で表現される．
 \begin{eqnarray}
  H = \sum_{i\neq j}{J_{ij}\sigma_{i}\sigma_{j}}+\sum_{i}{h_{i}\sigma_{i}}, \label{Ising_model}
 \end{eqnarray}
-ここで，$\sigma_{i}$は$\sigma\in\{-1,+1\}$の入力変数であり，$J_{i,j}$は二体相互作用のパラメータ，$h_{i}$は一体相互作用のパラメータである．アニーリングマシンに相互作用のパラメータ$J_{i,j},h_{i}$を与えることでエネルギーが最小となる$\sigma$の組み合わせ出力する
+ここで，$\sigma_{i}$は$\sigma \in \{ -1,+1\}$の入力変数であり，$J_{i,j}$は二体相互作用のパラメータ，$h_{i}$は一体相互作用のパラメータである．アニーリングマシンに相互作用のパラメータ$J_{i,j},h_{i}$を与えることでエネルギーが最小となる$\sigma$の組み合わせ出力する
 \subsection{QUBO形式}
-最適化問題を二値変数$\sgima\in\{-1,+1\}$を用いたイジングモデルに直接変換することは難しい．そこで，$\sigma$の代わりに$q\in\{0,1\}$を用いた形式にする．これはQUBO(Quadratic Unconstrained Binary Optimization)形式と呼ばれ、エネルギー関数は次のように表される．
+最適化問題を二値変数$\sigma\in\{-1,+1\}$を用いたイジングモデルに直接変換することは難しい．そこで，$\sigma$の代わりに$q\in\{0,1\}$を用いた形式にする．これはQUBO(Quadratic Unconstrained Binary Optimization)形式と呼ばれ、エネルギー関数は次のように表される．
 \begin{eqnarray}
  H = \sum_{i\neq j}{\widetilde{J}_{i,j}q_{i}q_{j}}+\sum_{i}{\widetilde{h}_{i}q_{i}}, \label{QUBO_model}
 \end{eqnarray}
@@ -95,7 +95,7 @@ $\eta$は追加変数であり、$x$に関する関数から$\eta$に関する�
 \subsection{$q$-loss関数へのLegendre変換の適用}
 先行研究では、式を凸関数の形に変換した後にLegendre変換と式変形を行うことで、次のようなQUBO形式への変換を行なった。
 \begin{eqnarray}
- L_{q}(m) = \min_{t}{\left\{(m-t)^{2}+(1-q)^{2}\frac{1-\mathrm{sign}(t-1)}{2}\right\}}
+ L_{q}(m) = \min_{t}{\left\{(m-t)^{2}+(1-q)^{2}\frac{1-\mathrm{sign}(t-1)}{2}\right\}} \nonumber
 \end{eqnarray}
 ここで、変数$t$はLegendre変換を適用することで追加された変数である。また、$m,t$は連続変数であるが、二進数展開を用いることで二体相互作用で表現可能であり、sign関数についても一体相互作用で表現することができる。
 
@@ -106,41 +106,106 @@ l1ノルム関数$f(m)$は式と定義され、グラフの外形は次のよう
 \end{eqnarray}
 式にLegendre変換を適用すると二次形式は次のようになる。
 \begin{eqnarray}
- F(m) = -\min{\{-mt\}} \quad text{subject to} \quad -1\leq t\leq 1
+ F(m) = -\min{\{-mt\}} \quad (-1\leq t\leq 1)
 \end{eqnarray}
 なお、$f(m)$の二次形式であることを強調するために、$F(m)$とおく。
 
 以上のように、$f(m)$のを二次形式で表現することができたが、$F(m)$の$\min$関数マイナス符号が付いているため、他のコスト関数と組み合わせた最適化問題を解くことができない。そこで、新たにWolfeの双対定理を適用する。Wolfeの双対定理の詳細については次の節で説明する。
 \subsection{Wolfeの双対定理}
 Wolfeの双対定理は、次のような不等式制約付き最適化(最大化)問題を、最大化(最適化)問題に書き換える物である。
-\begin{eqnarray}
- minimize_{x} \ f_{w}(x) & & (x\in\mathbb{R}^{n}) \nonumber \\
- subject \ to \ h_{i}(x) \leq 0 & & (i=1,2,\dots,l)
-\end{eqnarray}
+\begin{equation}
+  \left \{
+  \begin{array}{lll}
+    $minimize$_{x} & f_{w}(x) & (x\in\mathbb{R}^{n}) \\
+    $subject to$ & h_{i}(x)\leq 0 & (i=1,2,\cdots,l)
+  \end{array}
+  \right. \notag
+\end{equation}
 この最適化問題に対するラグランジュ関数は次のように表される。
-\begin{eqnarray}
- L(x,z) = f_{w}(x)+z^{T}h(x)
-\end{eqnarray}
+\begin{equation}
+  L(x,z)=f_{w}(x)+z^{T}h(x) \notag
+\end{equation}
 このラグランジュ関数とラグランジュ乗数$z\in\mathbb{R}^{l}$に対して、双対問題は次のように表される。
-\begin{eqnarray}
- maxmize_{x,z} \ L(x,z) & & ((x,z)\in\mathbb{R}^{n}\times\mathbb{R}^{l}) \nonumber \\
- subject \ to \ \tliangle L(x,z) = - & & (z\geq 0)
-\end{eqnarray}
+\begin{equation}
+  \left \{
+  \begin{array}{lll}
+    $maximize$_{x,z} & L(x,z) & ((x,z)\in\mathbb{R}^{n}\times\mathbb{R}^{l}) \\
+    $subject to$ & \triangledown L(x,z)=0 & (z\geq 0)
+  \end{array}
+  \right. \notag
+\end{equation}
 
 \subsection{l1ノルムへのWolfeの双対定理の利用}
 ここで、式に対して前節で説明したWolfeの双対定理を適用するため$F(m)$を式の形式に書き換えると次のようになる。
+\begin{equation}
+  \left \{
+  \begin{array}{ll}
+    $minimize$_{t} & -mt \\
+    $subject to$ & h_{1}(t)=-(t+1)\leq 0, \\
+    & h_{2}(t)=t-1\leq 0 \label{Wolfe_befor}
+  \end{array}
+  \right.
+\end{equation}
+Wolfeの双対定理を用いて最適化問題(\ref{Wolfe_befor})の双対問題を求めると次のようになる。
+\begin{equation}
+  \left \{
+  \begin{array}{ll}
+    $maximize$_{t,z} & -mt-z_{1}(t+1)+z_{2}(t-1) \\
+    $subject to$ & -m-z_{1}+z_{2}=0 \\
+    & (z_{1}\geq 0,z_{2}\geq 0) \label{Wolfe_after}
+  \end{array}
+  \right.
+\end{equation}
+なお、最適化問題(\ref{Wolfe_after})をQUBO形式にするためには、目的関数と制約条件を１つの式にまとめる必要がある。そのため最適化問題の式に制約条件を満たすように次のペナルティ項を加える。
 \begin{eqnarray}
- minimize_{t} -mt \nonumber \\
- subject to \ h_{1}(t) = -(t+1) \leq 0,h_{2}(t) = t-1 \leq 0
+  -M(-m-z_{1}+z_{2})^{2}
 \end{eqnarray}
-Wolfeの双対定理を用いて最適化問題の双対問題を求めると次のようになる。
+ここで、$M$は非常に大きな正の数とする。他の制約条件$-t\leq t\leq 1,z_{1}\geq 0,z_{2}\geq 0$については、二進数展開時に対応する値しか取らないように展開することで対応できる。
+
+以上より、l1ノルム関数のQUBO形式は次のようになる。
 \begin{eqnarray}
- maximize_{t,z} \ -mt-z_{1}(t+1)+z_{2}(t-1) \nonumber \\
- subject \ to \ -m-z_{1}+z_{2}=0 \quad (z_{1}\geq 0,z_{2}\geq 0)
+    F(m) = \min_{t,z_{1},z_{2}}{\{mt+z_{1}(t+1)-z_{2}(t-1)} \nonumber \\
+    +M(-m-z_{1}+z_{2})^{2}\} \label{l1_norm}
 \end{eqnarray}
 
 \section{余分な変数の削除}
+この章では、前章で導出した式(\ref{l1_norm})に対して数式の見直しを行う。
+
+制約条件の１つである$-m-z_{1}+z_{2}=0$を用いることで、式(\ref{l1_norm})の目的関数部は次のように式変形できる。
+\begin{eqnarray}
+  Obj &=& mt+z_{1}(t+1)-z_{2}(t-1) \nonumber \\
+  &=& mt+z_{1}(t+1)-(m+z_{1})(t-1) \nonumber \\
+  &=& z_{1}+(m+z_{1}) \nonumber \\
+  &=& z_{1}+z_{2}
+\end{eqnarray}
+よって、式(\ref{l1_norm})は次のようになる。
+\begin{eqnarray}
+  F(m) = \min_{z_{1},z_{2}}{\{z_{1}+z_{2}+M(-m-z_{1}+z_{2})^{2}\}} \nonumber \\
+  \label{l1}
+\end{eqnarray}
+
 \section{スパース推定への適用}
+この章では導出された二次形式のl1ノルムを利用てスパース推定を行う。LASSOの二次形式のコスト関数は式(\ref{l1})を用いて次のように表せる。
+\begin{eqnarray}
+  S_{\lambda}(\beta) &=& \|y-X\beta\|^{2}_{2} \nonumber \\
+  & & \mbox{}+\sum_{i=1}^{p}{\min_{z_{1i},z_{2i}}{\{z_{1i}+z_{2i}}} \nonumber \\
+  & & \mbox{}+M(-\beta_{i}-z_{1i}+z_{2i})^{2}\} \label{lasso_cost}
+\end{eqnarray}
+以降の節では、数値実験で利用したデータセットと実験の詳細についての説明を行う。
+
+\subsection{データセット}
+実験で利用するデータセットは次のように作成した。計画行列を$\mathcal{N}(0,1)$に従う$X\in\mathbb{R}^{300\times 5}$の行列、解を$\mathcal{U}(-10,10)$に従う$\beta\in\mathbb{R}^{5}$のベクトル、ノイズを$\mathcal{N}(0,0.1)$に従う$\epsilon\in\mathbb{R}^{300}$のベクトルと設定し、観測ベクトル$y\in\mathbb{R}^{300}$を次のようにとる。
+\begin{equation}
+  y = X\beta +\epsilon
+\end{equation}
+
+\subsection{実験の詳細}
+実験では連続値を用いて座標降下法とシミュレーテッドアニーリングでの比較を行なった。シミュレーテッドアニーリングの詳細は以下のようにした。
+%\begin{items}
+ % \item 反復回数；5,000,000回
+  %\item 
+%\end{items}
+
 lassoの問題設定について
 最小二乗法の数値実験の結果比較を載せる。連続値に対してはうまくいっていることが確認できている。
 
@@ -158,7 +223,7 @@ lassoの問題設定について
 \section{}
 
 \begin{biography}
-\profile*{aaa}{aaa}{aaa}
+%\profile*{}{}{}
 %\profile{会員種別}{名前}{紹介文}% 顔写真あり
 %\profile*{会員種別}{名前}{紹介文}% 顔写真なし
 \end{biography}
