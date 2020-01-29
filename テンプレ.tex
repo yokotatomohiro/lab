@@ -46,7 +46,9 @@ $l$1-norm，QUBO，Legendre transformation，Wolfe duality theorem
 
 アニーリングマシンのハードウェアは入力としてQUBO形式を受け付ける．そこで，最適化問題をQUBO形式に再定式化する必要がある．連続変数については二進数展開を行うことでイジングタイプの変数に変換することができるが，関数の系統的な導出方法はまだ示されていない．そのため問題をQUBO形式に置き換える研究は数多く行われている．例えば，論理ゲートを含むいくつかのNP問題に対してはLucasによって再定式化がなされている\cite{logic_gate,formulation}．近年では，ラベルノイズに対してロバスト性を持つ$q$-loss関数のQUBO形式の導出にLegendre変換が用いられた\cite{q-loss_formulation}．その後，ReLU型関数のQUBO形式の導出\cite{ReLU_function}にはLegendre変換だけでは不十分であることが明らかになり，新たにWolfeの双対定理\cite{Wolfe_duality}が用いられた．また，再定式化されたReLU型関数を組み合わせることで$l$1ノルムのQUBO形式の導出と数値実験が行われ，スパース制約にも利用できることが確認された\cite{ReLU_simmulate}．
 
-直接的な$l$1ノルムのQUBO形式の導出と定式化の見直しよる必要変数の削減が投稿者．しかし，
+直接的な$l$1ノルムのQUBO形式の導出と定式化の見直しよる必要変数の削減\cite{l1-norm}が発表者らによって行われたが，スパース制約の数値的な検証はまだ行われていない．そこで本稿では，まず$l$1ノルムのQUBO形式の直接的な導出と定式化の見直しを紹介する．そして導出したQUBO形式を用いてLASSOの再現を行い，推定結果にスパース性が現れるか検証する．
+
+
 
 
 %\bibliographystyle{sieicej}
