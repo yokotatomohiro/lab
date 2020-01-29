@@ -1,0 +1,56 @@
+%%「論文」，「レター」，「レター（C分冊）」，「技術研究報告」などのテンプレート
+%% v3.2 [2019/03/19]
+%% 4. 「技術研究報告」
+\documentclass[technicalreport]{ieicej}
+\usepackage[dvips]{graphicx}
+\usepackage[dvipdfmx]{graphicx,xcolor}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage{latexsym}
+\usepackage[fleqn]{amsmath}
+\usepackage{amssymb}
+
+\jtitle{イジング計算機での利用に向けた$l$1ノルムのQUBO形式について}
+\jsubtitle{}
+\etitle{QUBO formulation of l1-norm for Ising-type computers}
+\esubtitle{}
+\authorlist{%
+  \authorentry[]{横田　知大}{Tomohiro Yokota}{埼玉大学　大学院理工学研究科}
+  \authorentry[]{此島　真喜子}{Makiko Konoshima}{株式会社富士通研究所}
+  \authorentry[]{田村　泰孝}{Tamura Hirotaka}{株式会社富士通研究所}
+  \authorentyr[]{大久保　潤}{Jun Ohkubo}{埼玉大学　大学院理工学研究科}{国立研究開発法人　科学技術振興機構}
+% \authorentry[メールアドレス]{和文著者名}{英文著者名}{所属ラベル}
+}
+\affiliate[]{}{}
+%\affiliate[所属ラベル]{和文勤務先\\ 連絡先住所}{英文勤務先\\ 英文連絡先住所}
+
+\begin{document}
+
+\begin{jabstract}
+  量子アニーリングを含むイジングモデルを用いたアニーリング法においてスパース推定を可能にするために，近年，Rectified Linear Unit(ReLU)型関数のQuadratic Unconstrained Binary Optimization(QUBO)形式の導出が提案され，それを組み合わせて$l$1ノルムのQUBO形式の導出と数値実験が行われた．その後，発表者らにより，$l1$ノルムの直接的なQUBO形式の導出と定式化の見直しによる，より簡略化された$l$1ノルムのQUBO形式の導出が提案された．しかしながら簡略化された$l$1ノルムのQUBO形式を用いたスパース推定の数値的な検証はまだおこなわれていない．そこで，本稿では$l$1ノルムの直接的なQUBO形式の導出法を紹介し，連続値を用いたアニーリングによる数値実験でスパース性の検証を行う．数値実験では，スパースな推定がされていることを確認した．
+\end{jabstract}
+\begin{jkeyword}
+$l$1ノルム，QUBO，Legendre変換，Wolfeの双対定理
+\end{jkeyword}
+\begin{eabstract}
+英文アブストラクト
+\end{eabstract}
+\begin{ekeyword}
+$l$1-norm，QUBO，Legendre transformation，Wolfe duality theorem
+\end{ekeyword}
+\maketitle
+
+\section{まえがき}
+最適化問題の近似解を得ることに特化したアニーリングマシンが開発，提供されており，代表的なものにカナダのD-Wave.Inc\cite{d-wave01,d-wave02}の"D-Wave 2000"や富士通\cite{Digital_annealer}の"Digital Annealer"，日立の"CMOSアニーリングマシン"などがある．最適化問題は，データマイニングや機械学習などの多くの分野で利用されている．特に，KadowakiとNishimoriによって提案された量子アニーリング法\cite{Quantum_annealing}や，同様の考え方を持つ断熱量子計算\cite{AQC}の考え方が注目を集めた．また，これらを考え方を利用する上で問題としてシステムサイズの小ささが当時挙げられていたが，利用可能な量子ビット数が年々増加しているため，大きな最適化問題にも取り組めるようになった．
+
+アニーリングマシンのハードウェアは入力としてQUBO形式を受け付ける．そこで，最適化問題をQUBO形式に再定式化する必要がある．連続変数については二進数展開を行うことでイジングタイプの変数に変換することができるが，関数の系統的な導出方法はまだ示されていない．そのため問題をQUBO形式に置き換える研究は数多く行われている．例えば，論理ゲートを含むいくつかのNP問題に対してはLucasによって再定式化がなされている\cite{logic_gate,formulation}．近年では，ラベルノイズに対してロバスト性を持つ$q$-loss関数のQUBO形式の導出にLegendre変換が用いられた\cite{q-loss_formulation}．その後，ReLU型関数のQUBO形式の導出\cite{ReLU_function}にはLegendre変換だけでは不十分であることが明らかになり，新たにWolfeの双対定理\cite{Wolfe_duality}が用いられた．また，再定式化されたReLU型関数を組み合わせることで$l$1ノルムのQUBO形式の導出と数値実験が行われ，スパース制約にも利用できることが確認された\cite{ReLU_simmulate}．その後，発表者らによって直接的な$l$1ノルムのQUBO形式の導出と定式化の見直しよる必要変数の削減が行われた．しかし，
+
+
+%\bibliographystyle{sieicej}
+%\bibliography{myrefs}
+\begin{thebibliography}{99}% 文献数が10未満の時 {9}
+\bibitem{}
+\end{thebibliography}
+
+\end{document}
