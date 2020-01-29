@@ -44,7 +44,9 @@ $l$1-norm，QUBO，Legendre transformation，Wolfe duality theorem
 \section{まえがき}
 最適化問題の近似解を得ることに特化したアニーリングマシンが開発，提供されており，代表的なものにカナダのD-Wave.Inc\cite{d-wave01,d-wave02}の"D-Wave 2000"や富士通\cite{Digital_annealer}の"Digital Annealer"，日立の"CMOSアニーリングマシン"などがある．最適化問題は，データマイニングや機械学習などの多くの分野で利用されている．特に，KadowakiとNishimoriによって提案された量子アニーリング法\cite{Quantum_annealing}や，同様の考え方を持つ断熱量子計算\cite{AQC}の考え方が注目を集めた．また，これらを考え方を利用する上で問題としてシステムサイズの小ささが当時挙げられていたが，利用可能な量子ビット数が年々増加しているため，大きな最適化問題にも取り組めるようになった．
 
-アニーリングマシンのハードウェアは入力としてQUBO形式を受け付ける．そこで，最適化問題をQUBO形式に再定式化する必要がある．連続変数については二進数展開を行うことでイジングタイプの変数に変換することができるが，関数の系統的な導出方法はまだ示されていない．そのため問題をQUBO形式に置き換える研究は数多く行われている．例えば，論理ゲートを含むいくつかのNP問題に対してはLucasによって再定式化がなされている\cite{logic_gate,formulation}．近年では，ラベルノイズに対してロバスト性を持つ$q$-loss関数のQUBO形式の導出にLegendre変換が用いられた\cite{q-loss_formulation}．その後，ReLU型関数のQUBO形式の導出\cite{ReLU_function}にはLegendre変換だけでは不十分であることが明らかになり，新たにWolfeの双対定理\cite{Wolfe_duality}が用いられた．また，再定式化されたReLU型関数を組み合わせることで$l$1ノルムのQUBO形式の導出と数値実験が行われ，スパース制約にも利用できることが確認された\cite{ReLU_simmulate}．その後，発表者らによって直接的な$l$1ノルムのQUBO形式の導出と定式化の見直しよる必要変数の削減が行われた．しかし，
+アニーリングマシンのハードウェアは入力としてQUBO形式を受け付ける．そこで，最適化問題をQUBO形式に再定式化する必要がある．連続変数については二進数展開を行うことでイジングタイプの変数に変換することができるが，関数の系統的な導出方法はまだ示されていない．そのため問題をQUBO形式に置き換える研究は数多く行われている．例えば，論理ゲートを含むいくつかのNP問題に対してはLucasによって再定式化がなされている\cite{logic_gate,formulation}．近年では，ラベルノイズに対してロバスト性を持つ$q$-loss関数のQUBO形式の導出にLegendre変換が用いられた\cite{q-loss_formulation}．その後，ReLU型関数のQUBO形式の導出\cite{ReLU_function}にはLegendre変換だけでは不十分であることが明らかになり，新たにWolfeの双対定理\cite{Wolfe_duality}が用いられた．また，再定式化されたReLU型関数を組み合わせることで$l$1ノルムのQUBO形式の導出と数値実験が行われ，スパース制約にも利用できることが確認された\cite{ReLU_simmulate}．
+
+直接的な$l$1ノルムのQUBO形式の導出と定式化の見直しよる必要変数の削減が投稿者．しかし，
 
 
 %\bibliographystyle{sieicej}
