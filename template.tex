@@ -1,9 +1,9 @@
 %%「論文」，「レター」，「レター（C分冊）」，「技術研究報告」などのテンプレート
 %% v3.2 [2019/03/19]
-%% 1. 「論文」
-\documentclass[paper]{ieicej}
-%\usepackage[dvips]{graphicx}
-%\usepackage[dvipdfmx]{graphicx,xcolor}
+%% 4. 「技術研究報告」
+\documentclass[technicalreport]{ieicej}
+\usepackage[dvips]{graphicx}
+\usepackage[dvipdfmx]{graphicx,xcolor}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{textcomp}
@@ -11,221 +11,245 @@
 \usepackage[fleqn]{amsmath}
 \usepackage{amssymb}
 
-\setcounter{page}{1}
-
-\field{A}
-\jtitle{イジング計算機での利用に向けた$l1$ノルムのQUBO形式について}
+\jtitle{イジング計算機での利用に向けた$l$1ノルムのQUBO形式について}
+\jsubtitle{}
 \etitle{QUBO formulation of l1-norm for Ising-type computers}
+\esubtitle{}
 \authorlist{%
- \authorentry{横田 知大}{Tomohiro Yokota}{埼玉}\MembershipNumber{111111}
- %\authorentry{和文著者名}{英文著者名}{所属ラベル}\MembershipNumber{}
- %\authorentry[メールアドレス]{和文著者名}{英文著者名}{所属ラベル}\MembershipNumber{}
- %\authorentry{和文著者名}{英文著者名}{所属ラベル}[現在の所属ラベル]\MembershipNumber{}
-}
-\affiliate[埼玉]{埼玉}{Saitama}
-%\affiliate[所属ラベル]{和文所属}{英文所属}
-%\paffiliate[]{}
-%\paffiliate[現在の所属ラベル]{和文所属}
+  \authorentry[]{横田　知大}{Tomohiro Yokota}{Univ}
+  \authorentry[]{此島　真喜子}{Makiko Konoshima}{FUJI}
+  \authorentry[]{田村　泰孝}{Tamura Hirotaka}{FUJI}
+  \authorentry[]{大久保　潤}{Jun Ohkubo}{Univ,JST}}
+% \authorentry[メールアドレス]{和文著者名}{英文著者名}{所属ラベル}
+\affiliate[Univ]{埼玉大学　大学院理工学研究科}{Saitama university, Graduate school of science and engineering}
+\affiliate[FUJI]{株式会社富士通研究所}{FUJITSU LABORATORIES LTD}
+\affiliate[JST]{国立研究開発法人　科学技術振興機構}{Japan Science and Technology Agency}
+%\affiliate[所属ラベル]{和文勤務先\\ 連絡先住所}{英文勤務先\\ 英文連絡先住所}
 
 \begin{document}
 
-\begin{abstract}
-  本稿では量子アニーリングを含むイジングモデルを用いたアニーリング法においてスパース推定を可能にするために、近年ReLUタイプ関数のQUBO形式を導出するために用いられたLegendre変換とWolfeの双対定理を利用した。さらに$l1$ノルムに対してこれらの変換を素朴に適用した場合、余分な変数も現れることが明らかになった。最終的に余分な変数を取り除くことで、より簡略化されたQUBO形式を導出する。
-\end{abstract}
-\begin{keyword}
-%和文キーワード 4〜5語
-\end{keyword}
+\begin{jabstract}
+  量子アニーリングを含むイジングモデルを用いたアニーリング法においてスパース推定を可能にするために，近年，Rectified Linear Unit(ReLU)型関数のQuadratic Unconstrained Binary Optimization(QUBO)形式の導出が提案され，それを組み合わせて$l$1ノルムのQUBO形式の導出と数値実験が行われた．
+  その後，発表者らにより，$l1$ノルムの直接的なQUBO形式の導出と定式化の見直しによる，より簡略化された$l$1ノルムのQUBO形式の導出が提案された．
+  しかしながら簡略化された$l$1ノルムのQUBO形式を用いたスパース推定の数値的な検証はまだおこなわれていない．
+  そこで，本稿では$l$1ノルムの直接的なQUBO形式の導出法を紹介し，連続値を用いたアニーリングによる数値実験でスパース性の検証を行う．
+  数値実験では，スパースな推定がされていることを確認した．
+\end{jabstract}
+\begin{jkeyword}
+$l$1ノルム，QUBO，Legendre変換，Wolfeの双対定理
+\end{jkeyword}
 \begin{eabstract}
-%英文アブストラクト 100 words
+英文アブストラクト
 \end{eabstract}
 \begin{ekeyword}
-%英文キーワード
+$l$1-norm，QUBO，Legendre transformation，Wolfe duality theorem
 \end{ekeyword}
 \maketitle
 
-\section{はじめに} 
-近年、最適化問題の近似解を得ることに特化したアニーリングマシンが開発・提供されており、代表的なものにカナダのD-Wave.Incの''D-Wave 2000"や富士通の''Digital Annealer"、日立の''CMOSアニーリングマシン"などがある。最適化問題は、データマイニングや機械学習などの様々な分野で利用されている。特に、量子アニーリング法は門脇と西森によって提案され、同様の考え方をもつ断熱量子計算の考え方が注目を集めた。近年では実用化のための研究が行われており、
-アニーリングマシンのハードウェアはイジングモデルのハミルトニアンを基にしているので、最適化問題のコスト関数をQUBO形式に変換する必要がある。連続変数については二進数展開を行うことでイジングタイプの変数に変換することができるが、コスト関数を直接QUBO形式に再定式化する系統的な導出方法は示されていない。しかし、論理ゲートを含むいくつかのものに対してはLucasによって再定式化がされている。近年では、Legendre変換を用いた$q$-loss関数のQUBO形式での導出が行われた．また，近年発表されたReLUタイプ関数のQUBO形式での導出ではLegendre変換だけでは不十分であり，新たにWolfeの双対定理を用いて導出を行っていた．
+\section{まえがき}
+最適化問題の近似解を得ることに特化したアニーリングマシンが開発，提供されており，代表的なものにカナダのD-Wave.Inc\cite{d-wave01}\cite{d-wave02}の"D-Wave 2000"や富士通\cite{Digital_annealer}の"Digital Annealer"，日立の"CMOSアニーリングマシン"などがある．
+最適化問題は，データマイニングや機械学習などの多くの分野で利用されている．
+特に，KadowakiとNishimoriによって提案された量子アニーリング法\cite{Quantum_annealing}や，同様の考え方を持つ断熱量子計算\cite{AQC}の考え方が注目を集めた．
+また，これらを考え方を利用する上で問題としてシステムサイズの小ささが当時挙げられていたが，利用可能な量子ビット数が年々増加しているため，大きな最適化問題にも取り組めるようになった．
 
-本稿で導出を行うl1ノルムは$q$-loss関数やReLUタイプ関数のようにコスト関数のペナルティとして用いることで解に''スパース性"を与えることができる．スパース推定は画像処理や機械学習の分野で広く利用されており，データ数の削減や高次元で複雑なデータから関連のあるデータのみを抽出できることからとても重要である．l1ノルムに対するQUBO形式の導出はすでにされており、本稿では導出の概要についての説明、およびスパース推定への応用に関して記述する。
+アニーリングマシンのハードウェアは入力としてQUBO形式を受け付ける．
+そこで，最適化問題をQUBO形式に再定式化する必要がある．
+連続変数については二進数展開を行うことでイジングタイプの変数に変換することができるが，関数の系統的な導出方法はまだ示されていない．
+そのため問題をQUBO形式に置き換える研究は数多く行われている．
+例えば，論理ゲートを含むいくつかのNP問題に対してはLucasによって再定式化がなされている\cite{logic_gate}\cite{formulation}．
+近年では，ラベルノイズに対してロバスト性を持つ$q$-loss関数のQUBO形式の導出にLegendre変換が用いられた\cite{q-loss_formulation}．
+その後，ReLU型関数のQUBO形式の導出\cite{ReLU_function}にはLegendre変換だけでは不十分であることが明らかになり，新たにWolfeの双対定理\cite{Wolfe_duality}が用いられた．
+また，再定式化されたReLU型関数を組み合わせることで$l$1ノルムのQUBO形式の表現と数値実験が行われ，スパース制約にも利用できることが確認された\cite{ReLU_simmulate}．
 
-・l1ノルムに対するQUBO形式の導出はすでにされている。本稿では、導出の概要について説明し、スパース推定への応用に関して記述する。
+直接的な$l$1ノルムのQUBO形式の導出と定式化の見直しによる必要変数の削減\cite{l1-norm}が発表者らによって行われたが，スパース制約の数値的な検証はまだ行われていない．
+そこで本稿では，まず$l$1ノルムのQUBO形式の直接的な導出と定式化の見直しを紹介する．
+そして導出したQUBO形式を用いてLASSOの再現を行い，推定結果にスパース性が現れるか検証する．
 
-本稿の構成は次のようになる。まず第二章ではl1ノルムについての説明と利用例についての説明を行う。第三章ではQUBO形式とイジングモデルについての説明を行う。第四章では先行研究で行われた$q$-loss関数のQUBO形式への変換と導出に用いられたLegendre変換についての説明を行う。第五章ではReLUタイプ関数のQUBO形式を導出する際に追加で用いられたWolfeの双対定理についての説明とl1ノルムに対してLegendre変換とWolfeの双対定理を素朴に適用しることでQUBO形式への変換を行う。第六章では、第五章で導出された数式を見直すことで、余分な変数の削減を行う。第七章では、まとめと今後の展望について述べる。
-
-
-\section{l1ノルムとスパース推定}
-スパース推定とは、多くのパラメータのうちほとんどが$0$で、ごく一部のみ非$0$の値をとるように推定する方法である。スパース性を持つ推定方法の代表的なものにLeast Absolute Shrinkage and Selection Operator(LASSO)がある。LASSOでは、次の式をコスト関数としてコストが最小となるような回帰係数ベクトル$\beta$を推定をする。
+\section{$l$1ノルムとスパース推定}
+スパース推定とは，多くのパラメータのうちほとんどが0で，ごく一部のみ非0の値をとるように推定する方法である．
+スパース性を持つ推定方法の代表的なものにLeast Absolute Shrinkage and Selection Operator(LASSO)がある．
+LASSOでは次の式をコスト関数としてもち，コストが最小となるような回帰係数ベクトル$\beta$を推定する．
 \begin{eqnarray}
- S_{\lambda}(\beta) &=& \frac{1}{2n}\|y-X\beta\|^{2}_{2} + \lambda\|\beta\|_{1} \label{lasso}
+  S_{\lambda}(\beta)=\frac{1}{2n}\|y-X\beta\|^{2}_{2}+\lambda\|\beta\|_{1}
 \end{eqnarray}
-ここで、$y$は$y\in\mathbb{R}^{n}$次元の観測ベクトル、$X$は$X\in\mathbb{R}^{n\times p}$次元の計画行列、$\beta$は$\beta\in\mathbb{R}^{p}$の回帰係数ベクトル、$\lambda$は$\lambda >0$の正則化パラメータである。LASSOのコスト関数は最小二乗法のコスト関数に$l_{1}$ノルムを加えた単純な形であり、最小二乗法と比較して、汎化性能が高く過学習を抑えることができる。
+$y\in\mathbb{R}^{n}$は観測ベクトル，$X\in\mathbb{R}^{n\times p}$は計画行列，$\beta\in\mathbb{R}^{p}$は回帰係数ベクトル，$\lambda >0$は正則化パラメータである．
+$\lambda$によってスパース性の強さを調節することができる．
+LASSOのコスト関数は最小二乗法のコスト関数に$l$1ノルムを加えた単純な形であり，最小二乗法と比較して，汎化性能が高く過学習を抑え，推定結果にスパース性を与えられることから機械学習でよく用いられる．
 
-\section{QUBO形式とイジングモデル}
-一章で説明したように，アニーリングマシンはイジングモデルという物理モデルがハードウェアとして実装されており，アニーリングを高速で実行することで近似最適解を出力する．イジングモデルは次のエネルギー関数で表現される．
+\section{QUBO形式}
+アニーリングマシンはQUBO形式がハードウェアとして実装されている．QUBO形式は次のように表される．
 \begin{eqnarray}
- H = \sum_{i\neq j}{J_{ij}\sigma_{i}\sigma_{j}}+\sum_{i}{h_{i}\sigma_{i}}, \label{Ising_model}
+  \mathcal{H} = -\sum_{i,j}{J_{ij}\sigma_{i}\sigma_{j}}-\sum_{i}{h_{i}\sigma_{i}}. \label{QUBO_model}
 \end{eqnarray}
-ここで，$\sigma_{i}$は$\sigma \in \{ -1,+1\}$の入力変数であり，$J_{i,j}$は二体相互作用のパラメータ，$h_{i}$は一体相互作用のパラメータである．アニーリングマシンに相互作用のパラメータ$J_{i,j},h_{i}$を与えることでエネルギーが最小となる$\sigma$の組み合わせ出力する
-\subsection{QUBO形式}
-最適化問題を二値変数$\sigma\in\{-1,+1\}$を用いたイジングモデルに直接変換することは難しい．そこで，$\sigma$の代わりに$q\in\{0,1\}$を用いた形式にする．これはQUBO(Quadratic Unconstrained Binary Optimization)形式と呼ばれ、エネルギー関数は次のように表される．
+$\sigma_{i}\in\{ 0,1\}$は$i$番目のスピンを表すスピン変数，$J_{ij}\in\mathbb{R}$は$i$と$j$のスピン間の二体相互作用，$h_{i}\in\mathbb{R}$は$i$番目のスピンに対する一体相互作用である．
+
+このQUBO形式はコスト関数に対応しているので，最適化問題のコスト関数をQUBO形式で表現できれば，アニーリングマシンを用いて解くことができるようになる．
+
+\section{$q$-loss関数のQUBO形式での導出}
+Denchevらによって提案された$q$-loss関数とQUBO形式での導出について紹介する．
+$q$-loss関数のコスト関数は次のように表され，グラフの概形は図\ref{fig:q-loss}のようになる．
 \begin{eqnarray}
- H = \sum_{i\neq j}{\widetilde{J}_{i,j}q_{i}q_{j}}+\sum_{i}{\widetilde{h}_{i}q_{i}}, \label{QUBO_model}
+  L_{q}(m)=\min{\left((1-q)^{2},(\max{(0,1-m)})^{2}\right)}. \label{q-loss_cost_function}
 \end{eqnarray}
-
-\section{先行研究：$q$-loss関数のQUBO形式での導出}
-この章では先行研究で行われた$q$-loss関数のQUBO形式での導出について紹介する。$q$-loss関数は式と定義され、グラフの外形は図のようになる。
-\begin{eqnarray}
- L_{q}(m) = \min{[(1-q)^{2},(\max{[0,1-m]})^{2}]},
-\end{eqnarray}
-ここで、$q\in(-\infty,0]$のパラメータであり、$m$は実変数である。
-
-分類問題において、この$q$-loss関数をコスト関数のペナルティ項と用いることで、識別境界から大きく離れたラベルノイズが存在してもロバスト性を確保するすることができる。
-
-式は$\min$関数と$\max$関数が含まれているため二次形式ではなく、またQUBO形式でもない。そこで、Legendre変換を用いることで式をQUBO形式に変換する。次の節ではLegendre変換についての説明を行う。
+$q\in [-\infty ,0)$はパラメータであり，区間$(-q,1)$は二次関数，それ以外の区間は定数となる．
+文献\cite{q-loss_formulation}において，$q$-loss関数をコスト関数のペナルティ項として用いることで，識別境界から大きく離れた外れ値に対して，ペナルティを一定にすることでロバスト性を確保できることを解説している．
+また，アニーリングマシンへの実装のために，Legendre変換を用いたQUBO形式への導出も紹介されている．
 
 \subsection{Legendre変換}
-この節では、Legendre変換についての簡単な説明を行う。$f_{L}(x)$を凸関数とするとき、次のような関数$f^{*}_{L}(\eta)$を考える。
+関数$f_{L}(m)$に対するLengedre変換は次のように表される．
 \begin{eqnarray}
- f^{*}_{L}(\eta) &=& \min{\{\eta x-f(x)\}} \\
-                 &=& -\max{\{f(x)-\eta x\}}
+  f^{*}_{L}(\eta)&=&\sup_{m}{\{\eta m-f_{L}(m)\}} \nonumber \\
+  &=& -\inf_{m}{\{f_{L}(\eta)-\eta m\}}.
 \end{eqnarray}
-$\eta$は追加変数であり、$x$に関する関数から$\eta$に関する関数へと変換している。ここでこのような$f(x)_{L}$から$f^{*}_{L}(\eta)$への変換をLegendre変換と呼び、$f^{*}_{L}(\eta)$のことを共役関数と呼ぶ。また、元の関数$f(x)_{L}$が凸関数の場合、共役関数の共役関数つまり、$f^{*}_{L}(\eta)$の共役関数$f^{**}_{L}$は元の関数と一致するという性質を持つ。
+$f^{*}_{L}$を$f_{L}$の共役関数と呼ぶ．また，関数$f_{L}$に凸性を持つ場合，任意の$x_{1},x_{2}\in\mathbb{R}$と$0<\lambda <1$について常に次の関係が成り立つ．
+\begin{eqnarray}
+  f_{L}(\lambda x_{1}+(1-\lambda)x_{2})\leq\lambda f_{L}(x_{1})+(1-\lambda)f_{L}(x_{2}).
+\end{eqnarray}
+また，$f_{L}$に対してLegendre変換を2回適用した関数$f^{**}_{L}$は元の関数$f_{L}$と一致する．
 
 \subsection{$q$-loss関数へのLegendre変換の適用}
-先行研究では、式を凸関数の形に変換した後にLegendre変換と式変形を行うことで、次のようなQUBO形式への変換を行なった。
+$q$-loss関数に対してLegendre変換などを適用することで次のQUBO形式が得られる．
 \begin{eqnarray}
- L_{q}(m) = \min_{t}{\left\{(m-t)^{2}+(1-q)^{2}\frac{1-\mathrm{sign}(t-1)}{2}\right\}} \nonumber
+  L_{q}(m)=\min_{t}{\left\{(m-t)^{2}+(1-q)^{2}\frac{1-\textrm{sign}(t-1)}{2}\right\}}. \label{q-loss_QUBO_model}
 \end{eqnarray}
-ここで、変数$t$はLegendre変換を適用することで追加された変数である。また、$m,t$は連続変数であるが、二進数展開を用いることで二体相互作用で表現可能であり、sign関数についても一体相互作用で表現することができる。
+式\ref{q-loss_QUBO_model}は$m,t$について二次形式であり，最小化の形で表現されている．
+また，$m,t$は連続変数であるが，二進数展開を用いることで二体相互作用で表現可能でり，sign関数についても二進数展開時に一体相互作用として表現できる．
 
-\section{l1ノルムの素朴なQUBO形式での導出}
-l1ノルム関数$f(m)$は式と定義され、グラフの外形は次のようになる。
+\section{$l$1ノルムの素朴なQUBO形式での導出}
+文献\cite{l1-norm}では$l$1ノルムのQUBO形式の素朴な導出と再定式化が行われた．本章ではその導出と再定式化を紹介する．
+$l$1ノルムは次のように表され，グラフの概形は図\ref{fig:l1-norm}のようになる．
 \begin{eqnarray}
- f(m) = -\min{[-m,m]}
+  f(m) = \|m\|_{1} = -\min{(-m,m)}. \label{l1-norm_01}
 \end{eqnarray}
-式にLegendre変換を適用すると二次形式は次のようになる。
+$l$1ノルムはコスト関数の正則化項としてよく用いられ，解にスパース性を与えることができる．
+式\ref{l1-norm_01}にLegendre変換を適用すると二次形式は次のようになる．
 \begin{eqnarray}
- F(m) = -\min{\{-mt\}} \quad (-1\leq t\leq 1)
+  F(m) = -\min{\{-mt\}} \quad (-1\leq t\leq 1). \label{l1-norm_02}
 \end{eqnarray}
-なお、$f(m)$の二次形式であることを強調するために、$F(m)$とおく。
+$f(m)$の二次形式であることを強調するために，$F(m)$とおく．
 
-以上のように、$f(m)$のを二次形式で表現することができたが、$F(m)$の$\min$関数マイナス符号が付いているため、他のコスト関数と組み合わせた最適化問題を解くことができない。そこで、新たにWolfeの双対定理を適用する。Wolfeの双対定理の詳細については次の節で説明する。
-\subsection{Wolfeの双対定理}
-Wolfeの双対定理は、次のような不等式制約付き最適化(最大化)問題を、最大化(最適化)問題に書き換える物である。
+式\ref{l1-norm_02}のように，$f(m)$を二次形式で表現できたが，式\ref{l1-norm_02}では$\min$関数にマイナス符号が付いているため，$F(m)$と他のコスト関数$C(m)$を組み合わせた最適化問題を解くことできない．
+\begin{eqnarray}
+  \min_{m}{\left\{C(m)+F(m)\right\}} &=& \min_{m}{\left\{C(m)-\min_{t}{\left\{-mt\right\}}\right\}} \nonumber \\
+  & \neq & \min_{m,t}{\left\{C(m)-(-mt)\right\}}.
+\end{eqnarray}
+そこで，新たにWolfeの双対定理が利用された．
+
+\subsection{Wolfeの双対定理} \label{sec:wolfe}
+Wolfeの双対定理は，次のような不等式制約付き最適化問題の双対問題の導出に用いられる．
 \begin{equation}
-  \left \{
+  \left\{
   \begin{array}{lll}
-    $minimize$_{x} & f_{w}(x) & (x\in\mathbb{R}^{n}) \\
-    $subject to$ & h_{i}(x)\leq 0 & (i=1,2,\cdots,l)
-  \end{array}
-  \right. \notag
-\end{equation}
-この最適化問題に対するラグランジュ関数は次のように表される。
-\begin{equation}
-  L(x,z)=f_{w}(x)+z^{T}h(x) \notag
-\end{equation}
-このラグランジュ関数とラグランジュ乗数$z\in\mathbb{R}^{l}$に対して、双対問題は次のように表される。
-\begin{equation}
-  \left \{
-  \begin{array}{lll}
-    $maximize$_{x,z} & L(x,z) & ((x,z)\in\mathbb{R}^{n}\times\mathbb{R}^{l}) \\
-    $subject to$ & \triangledown L(x,z)=0 & (z\geq 0)
-  \end{array}
-  \right. \notag
-\end{equation}
-
-\subsection{l1ノルムへのWolfeの双対定理の利用}
-ここで、式に対して前節で説明したWolfeの双対定理を適用するため$F(m)$を式の形式に書き換えると次のようになる。
-\begin{equation}
-  \left \{
-  \begin{array}{ll}
-    $minimize$_{t} & -mt \\
-    $subject to$ & h_{1}(t)=-(t+1)\leq 0, \\
-    & h_{2}(t)=t-1\leq 0 \label{Wolfe_befor}
+    $minimize$_{x} & f_{W}(x) & (x\in\mathbb{R}^{n}), \\
+    $subject to$ & h_{i}(x)\leq 0 & (i=1,2,\cdots,l). \label{wolfe_01}
   \end{array}
   \right.
 \end{equation}
-Wolfeの双対定理を用いて最適化問題(\ref{Wolfe_befor})の双対問題を求めると次のようになる。
+$f_{W}(x)$は最適化したい凸関数で，$h_{i}$は凸な不等式制約である．
+目的関数と制約条件がどちらも微分可能であるとき，最適化問題に対するラグランジュ関数は次のようになる．
+\begin{eqnarray}
+  L(x,z) = f_{W}(x)+z^{T}h(x).
+\end{eqnarray}
+$z\in\mathbb{R}^{l}$はラグランジュ乗数である．Wolfeの双対定理より，式\ref{wolfe_01}の双対問題は次のように表される．
 \begin{equation}
-  \left \{
-  \begin{array}{ll}
-    $maximize$_{t,z} & -mt-z_{1}(t+1)+z_{2}(t-1) \\
-    $subject to$ & -m-z_{1}+z_{2}=0 \\
-    & (z_{1}\geq 0,z_{2}\geq 0) \label{Wolfe_after}
+  \left\{
+  \begin{array}{lll}
+    $maximize$_{x,z} & L(x,z) & ((x,z)\in\mathbb{R}^{n}\times\mathbb{R}^{l}), \\
+    $subject to$ & \triangledown L(x,z)=0 & (z\geq 0). \label{wolfe_02}
   \end{array}
   \right.
 \end{equation}
-なお、最適化問題(\ref{Wolfe_after})をQUBO形式にするためには、目的関数と制約条件を１つの式にまとめる必要がある。そのため最適化問題の式に制約条件を満たすように次のペナルティ項を加える。
-\begin{eqnarray}
-  -M(-m-z_{1}+z_{2})^{2}
-\end{eqnarray}
-ここで、$M$は非常に大きな正の数とする。他の制約条件$-t\leq t\leq 1,z_{1}\geq 0,z_{2}\geq 0$については、二進数展開時に対応する値しか取らないように展開することで対応できる。
 
-以上より、l1ノルム関数のQUBO形式は次のようになる。
+\subsection{$l$1ノルムへのWolfeの双対定理の適用}
+\ref{sec:wolfe}節で紹介したWolfeの双対定理を式\ref{l1-norm_02}に適用することで最適化問題を最大化問題に変換する．まず，式(\ref{l1-norm_02})を式(\ref{wolfe_01})の形式に書き換える．
+\begin{equation}
+  \left\{
+  \begin{array}{ll}
+    $minimize$_{t} & -mt, \\
+    $subject to$ & -(t+1)\leq 0,\ t-1\leq 0. \label{l1-norm_03}
+  \end{array}
+  \right.
+\end{equation}
+Wolfeの双対定理を用いて最適化問題(\ref{l1-norm_03})の双対問題を求めると次のようになる．
+\begin{equation}
+  \left\{
+  \begin{array}{ll}
+    $maximize$_{t,z} & -mt-z_{1}(t+1)+z_{2}(t-1), \\
+    $subject to$ & -m-z_{1}+z_{2}=0,\ z_{1}\geq 0,\ z_{2}\geq 0. \label{l1-norm_04}
+  \end{array}
+  \right.
+\end{equation}
+
+最適化問題(\ref{l1-norm_04})をQUBO形式にするためには，目的関数と制約条件を１つの式にまとめる必要がある．制約条件$-m-z_{1}+z_{2}=0$については，目的関数に次のペナルティ項を加えることで消去できる．
 \begin{eqnarray}
-    F(m) = \min_{t,z_{1},z_{2}}{\{mt+z_{1}(t+1)-z_{2}(t-1)} \nonumber \\
-    +M(-m-z_{1}+z_{2})^{2}\} \label{l1_norm}
+  -M(-m-z_{1}+z_{2})^{2}. \label{penalty}
+\end{eqnarray}
+$M$は非常に大きな正の定数である．残りの制約条件$-1\leq t\leq 1,z_{1}\geq 0,z_{2}\geq 0$については，それぞれの制約条件の区間に一致するように二進数展開することで，QUBO形式にすることができる．
+
+したがって，$l$1ノルムのQUBO形式は次のようになる．
+\begin{eqnarray}
+  &F&(m) \nonumber \\
+  &=& -\max_{t,z_{1},z_{2}}{\left\{-mt-z_{1}(t+1)+z_{2}(t-1)-M(-m-z_{1}+z_{2})^{2}\right\}} \nonumber \\
+  &=& \min_{t,z_{1},z_{2}}{\left\{mt+z_{1}(t+1)-z_{2}(t-1)++M(-m-z_{1}+z_{2})^{2}\right\}} \label{l1-norm_befor}
 \end{eqnarray}
 
 \section{余分な変数の削除}
-この章では、前章で導出した式(\ref{l1_norm})に対して数式の見直しを行う。
+この章では，式(\ref{l1-norm_befor})の再定式化を行う．
 
-制約条件の１つである$-m-z_{1}+z_{2}=0$を用いることで、式(\ref{l1_norm})の目的関数部は次のように式変形できる。
+制約条件の１つである$-m-z_{1}+z_{2}=0$は，式(\ref{penalty})をペナルティ項として加えることで制約を満たすようにしている．そこで，$z_{2}=m+z_{1}$を用いて式(\ref{l1-norm_befor})を次のように式変形できる．
 \begin{eqnarray}
-  Obj &=& mt+z_{1}(t+1)-z_{2}(t-1) \nonumber \\
-  &=& mt+z_{1}(t+1)-(m+z_{1})(t-1) \nonumber \\
-  &=& z_{1}+(m+z_{1}) \nonumber \\
-  &=& z_{1}+z_{2}
+  &F&(m) \nonumber \\
+  &=& mt+z_{1}(t+1)-z_{2}(t-1)+M(-m-z_{1}+z_{2})^{2} \nonumber \\
+  &=& mt+z_{1}(t+1)-(m+z_{1})(t-1)+M(-m-z_{1}+z_{2})^{2} \nonumber \\
+  &=& z_{1}+(m+z_{1})+M(-m-z_{1}+z_{2})^{2} \nonumber \\
+  &=& z_{1}+z_{2}+M(-m-z_{1}+z_{2})^{2} \label{l1-norm_after}
 \end{eqnarray}
-よって、式(\ref{l1_norm})は次のようになる。
-\begin{eqnarray}
-  F(m) = \min_{z_{1},z_{2}}{\{z_{1}+z_{2}+M(-m-z_{1}+z_{2})^{2}\}} \nonumber \\
-  \label{l1}
-\end{eqnarray}
+論文\cite{l1-norm}では連続値を用いた数値実験で式(\ref{l1-norm_after})が$l$1ノルムを表現していることを確認した．
 
 \section{スパース推定への適用}
-この章では導出された二次形式のl1ノルムを利用てスパース推定を行う。LASSOの二次形式のコスト関数は式(\ref{l1})を用いて次のように表せる。
-\begin{eqnarray}
-  S_{\lambda}(\beta) &=& \|y-X\beta\|^{2}_{2} \nonumber \\
-  & & \mbox{}+\sum_{i=1}^{p}{\min_{z_{1i},z_{2i}}{\{z_{1i}+z_{2i}}} \nonumber \\
-  & & \mbox{}+M(-\beta_{i}-z_{1i}+z_{2i})^{2}\} \label{lasso_cost}
-\end{eqnarray}
-以降の節では、数値実験で利用したデータセットと実験の詳細についての説明を行う。
+この章では式(\ref{l1-norm_after})を用いてスパース推定を行う．
+ 
+  
+  
 
-\subsection{データセット}
-実験で利用するデータセットは次のように作成した。計画行列を$\mathcal{N}(0,1)$に従う$X\in\mathbb{R}^{300\times 5}$の行列、解を$\mathcal{U}(-10,10)$に従う$\beta\in\mathbb{R}^{5}$のベクトル、ノイズを$\mathcal{N}(0,0.1)$に従う$\epsilon\in\mathbb{R}^{300}$のベクトルと設定し、観測ベクトル$y\in\mathbb{R}^{300}$を次のようにとる。
-\begin{equation}
-  y = X\beta +\epsilon
-\end{equation}
 
-\subsection{実験の詳細}
-実験では連続値を用いて座標降下法とシミュレーテッドアニーリングでの比較を行なった。シミュレーテッドアニーリングの詳細は以下のようにした。
-%\begin{items}
- % \item 反復回数；5,000,000回
-  %\item 
-%\end{items}
+  
 
-lassoの問題設定について
-最小二乗法の数値実験の結果比較を載せる。連続値に対してはうまくいっていることが確認できている。
-
-\section{まとめと今後の展望}
-
-\ack %% 謝辞
-
+  
+  
 %\bibliographystyle{sieicej}
 %\bibliography{myrefs}
 \begin{thebibliography}{99}% 文献数が10未満の時 {9}
-\bibitem{}
+\bibitem{d-wave01}
+  M.W.Johnson, M.H.S. Amin, S. Gildert, T.Lanting, F. Hamze, N.Dickson, R. Harris, A.J. Berkley, J. Johansson, P. Bunyk, E.M. Chapple, C. Enderud, J.P. Hilton, K. Karimi, E. Ladizinsky, N. Ladizinsky, T. Oh, I. Perminov, C. Rich, M.C. Thom, E. Tolkacheva, C.J.S. Truncik, S. Uchikin, J. Wang, B. Wilson and G. Rose, "Quantum annealing with manufactured spins," Nature vol.473, pp.194-198, May 2011.
+  
+  DOI:10.1038/nature10012
+\bibitem{d-wave02}
+  P.I. Bunyk, E. Hoskinson, M.W. Johnson, E. Tolkacheva, F. Altomare, A.J. Berkley, R. Harris, J.P. Hilton, T. Lanting, A.J. Przybysz and J. Whittaker, "Architectural Considerations in the Design of a Superconducting Quantum Annealing Processor," Proc. IEEE, vol.24, no.4, August 2014.
+  
+  DOI:10.1109/TASC.2014.2318294
+\bibitem{Digital_annealer}
+  M. Aramon, G. Rosenberg, E. Valiante, T. Miyazawa, H. Tamura and H.G. Katzgraber, "Physics-Inspired Optimization for Quadratic Unconstrained Problems Using a Digital Annealer," Front. Physics 7:48. Mar 2019.
+  
+  DOI:10.3389/fphy.2019.00048
+\bibitem{Quantum_annealing}
+  T. Kadowaki and H. Nishimori, "Quantum annealing in the transverse Ising model," Phys. Rev. E, vol.58, Nov 1998.
+  
+  DOI:10.1103/PhysRevE.58.5355
+\bibitem{AQC}
+  E. Farhi, J. Goldstone, S. Gutmann, J. Lapan, A. Lundgren and D. Preda, "A quantum adiabatic evolution algorithm applied to random instances of an NP-complete problem,"
+\bibitem{formulation}
+  A. Lucas, "Ising formulations of many NP problems," Front. Physics 2:5. Feb 2014.
+  
+  DOI:10.3389/fphy.2014.00005
+\bibitem{logic_gate}
+  J.D. Whitfield, M. Faccin and J.D. Biamonte, "Ground-state spin logic," EPL, vol.99, Sept 2012.
+  
+  DOI:10.1209/0295-5075/99/57004
+\bibitem{q-loss_formulation}
+  V. Denchev, N. Ding, S.V.N. Vishwanathan, and H. Neven, "Robust Classification with Adiabatic Quantum Optimization," Proc. 29th International Conf. on Machine Learning, pp.863-870, Jul 2012.
+\bibitem{ReLU_function}
+  G. Sato, M. Konoshima, T. Ohwa, H. Tamura, and J. Ohkubo, "Quadratic unconstrained binary optimization formulation for rectified-linear-unit-type function," Phys. Rev. E, vol.99, Apr 2019.
 \end{thebibliography}
-
-\appendix
-\section{}
-
-\begin{biography}
-%\profile*{}{}{}
-%\profile{会員種別}{名前}{紹介文}% 顔写真あり
-%\profile*{会員種別}{名前}{紹介文}% 顔写真なし
-\end{biography}
 
 \end{document}
