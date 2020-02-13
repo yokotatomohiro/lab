@@ -1,3 +1,4 @@
+
 # -*- coding:utf-8 -*-
 import time
 import math
@@ -24,20 +25,40 @@ E = Σ^{N}_{i,j=1}{Σ^{m}_{k=1}{J_{ij}σ_{i,k}σ_{j,k}}}
 """
 
 # パラメータの設定
-TROTTER_DIM = int(input("トロッター次元数: m = ")) 
-ANN_PARA = float(input("初期パラメータ: Γ_init = "))
-ANN_STEP = int(input("アニーリング数: ANN = "))
-MC_STEP = int(input("モンテカルロステップ: MC = "))
-BETA = float(input("初期逆温度: β = "))
-REDUCE_PARA = 0.99 # 減衰率
+#TROTTER_DIM = int(input("トロッター次元数: m = ")) 
+#ANN_PARA = float(input("初期パラメータ: Γ_init = "))
+#ANN_STEP = int(input("アニーリング数: ANN = "))
+#MC_STEP = int(input("モンテカルロステップ: MC = "))
+#BETA = float(input("初期逆温度: β = "))
+#REDUCE_PARA = 0.99 # 減衰率
 
-# データセットの内容を取得する
-FILE_NAME = ''
+# データセットの内容を取得する .csvファイルを読み込む
+FILE_NAME = 'artificial_dataset.csv'
 
 f = open(os.path.dirname(os.path.abspath(FILE_NAME))+'/'+FILE_NAME).read().split("\n")
 
 # データセットのファイル
 X = [] # 計画行列
-Y = [] # 解のベクトル
+Y = [] # 回帰ベクトル
+
+DATA = [] # データセット　計算では利用しない
+
+for i in f:
+    i = i.split(',')
+    i.remove(i[0])
+    DATA.append(i)
+    
+# データセットの次元の名前を取り出す
+NAME_DIM = DATA[0]
+
+del DATA[0],DATA[-1]
+Y.append([l[-1] for l in DATA])
+X.append([l[:].remove(l[-1]) for l in DATA])
+print(X)
+
+if __name__ == '__main__':
+    pass
+
+
 
 
